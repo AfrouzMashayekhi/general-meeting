@@ -56,19 +56,50 @@ parsePeerConnectionParameters() {
 
   PEER_CONN_PARMS=""
   PEERS=""
+  # while [ "$#" -gt 0 ]; do
+  #   setGlobals $1
+  #   PEER="peer0.org$1"
+  #   PEERS="$PEERS $PEER"
+  #   PEER_CONN_PARMS="$PEER_CONN_PARMS --peerAddresses $CORE_PEER_ADDRESS"
+  #   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "true" ]; then
+  #     TLSINFO=$(eval echo "--tlsRootCertFiles \$PEER0_ORG$1_CA")
+  #     PEER_CONN_PARMS="$PEER_CONN_PARMS $TLSINFO"
+  #   fi
+  #   # shift by two to get the next pair of peer/org parameters
+  #   shift
+  # done
+  # remove leading space for output
   while [ "$#" -gt 0 ]; do
     setGlobals $1
-    PEER="peer0.org$1"
-    PEERS="$PEERS $PEER"
-    PEER_CONN_PARMS="$PEER_CONN_PARMS --peerAddresses $CORE_PEER_ADDRESS"
-    if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "true" ]; then
-      TLSINFO=$(eval echo "--tlsRootCertFiles \$PEER0_ORG$1_CA")
-      PEER_CONN_PARMS="$PEER_CONN_PARMS $TLSINFO"
+    if [ $1 -eq 1 ]; then
+      PEER="peer0.customer"
+      PEERS="$PEERS $PEER"
+      PEER_CONN_PARMS="$PEER_CONN_PARMS --peerAddresses $CORE_PEER_ADDRESS"
+      if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "true" ]; then
+        TLSINFO=$(eval echo "--tlsRootCertFiles \$PEER0_CUSTOMER_CA")
+        PEER_CONN_PARMS="$PEER_CONN_PARMS $TLSINFO"
+      fi
+    elif [ $1 -eq 2 ]; then
+      PEER="peer0.regulator"
+      PEERS="$PEERS $PEER"
+      PEER_CONN_PARMS="$PEER_CONN_PARMS --peerAddresses $CORE_PEER_ADDRESS"
+      if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "true" ]; then
+        TLSINFO=$(eval echo "--tlsRootCertFiles \$PEER0_REGULATOR_CA")
+        PEER_CONN_PARMS="$PEER_CONN_PARMS $TLSINFO"
+      fi
+    elif [ $1 -eq 3 ]; then
+      PEER="peer0.sharedealer"
+      PEERS="$PEERS $PEER"
+      PEER_CONN_PARMS="$PEER_CONN_PARMS --peerAddresses $CORE_PEER_ADDRESS"
+      if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "true" ]; then
+        TLSINFO=$(eval echo "--tlsRootCertFiles \$PEER0_SHAREDEALER_CA")
+        PEER_CONN_PARMS="$PEER_CONN_PARMS $TLSINFO"
+      fi
+    else
+      echo "================== ERROR !!! ORG Unknown =================="
     fi
-    # shift by two to get the next pair of peer/org parameters
     shift
   done
-  # remove leading space for output
   PEERS="$(echo -e "$PEERS" | sed -e 's/^[[:space:]]*//')"
 }
 

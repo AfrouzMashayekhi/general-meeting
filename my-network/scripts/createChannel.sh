@@ -149,17 +149,19 @@ echo "Creating channel "$CHANNEL_NAME
 createChannel
 
 ## Join all the peers to the channel
-echo "Join Org1 peers to the channel..."
+echo "Join Customer peers to the channel..."
 joinChannel 1
-echo "Join Org2 peers to the channel..."
+echo "Join Regulator peers to the channel..."
 joinChannel 2
-
+echo "Join Sharedealer peers to the channel..."
+joinChannel 3
 ## Set the anchor peers for each org in the channel
-echo "Updating anchor peers for org1..."
+echo "Updating anchor peers for customer..."
 updateAnchorPeers 1
-echo "Updating anchor peers for org2..."
+echo "Updating anchor peers for regulator..."
 updateAnchorPeers 2
-
+echo "Updating anchor peers for sharedealer..."
+updateAnchorPeers 3
 echo
 echo "========= Channel successfully joined =========== "
 echo

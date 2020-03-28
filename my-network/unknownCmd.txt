@@ -20,5 +20,12 @@
 # which are always stored in lower case.
 
 
-organization/ccp-generate.sh
+
 scripts/envVar.sh
+scripts/createChannel.sh
+
+
+function deployCC()
+
+
+\
