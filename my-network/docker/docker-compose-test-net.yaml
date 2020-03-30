@@ -18,7 +18,7 @@ services:
 
   orderer.share.com:
     container_name: orderer.share.com
-    image: hyperledger/fabric-orderer:$IMAGE_TAGs
+    image: hyperledger/fabric-orderer:$IMAGE_TAG
     environment:
       - FABRIC_LOGGING_SPEC=INFO
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
