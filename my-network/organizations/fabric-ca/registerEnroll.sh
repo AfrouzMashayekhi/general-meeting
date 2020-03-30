@@ -1,5 +1,3 @@
-
-
 function createCustomer {
 
   echo
@@ -216,7 +214,7 @@ function createRegulator {
 }
 
 
-function creatShareDealer {
+function createShareDealer {
 
   echo
 	echo "Enroll the CA admin"
