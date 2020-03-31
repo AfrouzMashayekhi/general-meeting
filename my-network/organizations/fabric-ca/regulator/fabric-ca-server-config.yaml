@@ -80,7 +80,7 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name: Org2CA
+  name: RegulatorCA
   # Key file (is only used to import a private key into BCCSP)
   keyfile:
   # Certificate file (default: ca-cert.pem)
@@ -237,10 +237,12 @@ ldap:
 # which are always stored in lower case.
 #############################################################################
 affiliations:
-   org1:
+   customer:
       - department1
       - department2
-   org2:
+   regulator:
+      - department1
+   sharedealer:
       - department1
 
 #############################################################################
@@ -301,16 +303,16 @@ signing:
 #     CA certificates though it can still issue end entity certificates.
 ###########################################################################
 csr:
-   cn: ca.org2.example.com
+   cn: ca.regulator.share.com
    names:
       - C: UK
         ST: "Hampshire"
         L: "Hursley"
-        O: org2.example.com
+        O: regulator.share.com
         OU:
    hosts:
      - localhost
-     - org2.example.com
+     - regulator.share.com
    ca:
       expiry: 131400h
       pathlength: 1

@@ -1,0 +1,43 @@
+---
+name: first-network-${ORG_NAME}
+version: 1.0.0
+client:
+  organization: ${ORG}
+  connection:
+    timeout:
+      peer:
+        endorser: '300'
+organizations:
+  ${ORG}:
+    mspid: ${ORG}MSP
+    peers:
+    - peer0.${ORG_NAME}.share.com
+    - peer1.${ORG_NAME}.share.com
+    certificateAuthorities:
+    - ca.${ORG_NAME}.share.com
+peers:
+  peer0.${ORG_NAME}.share.com:
+    url: grpcs://localhost:${P0PORT}
+    tlsCACerts:
+      pem: |
+        ${PEERPEM}
+    grpcOptions:
+      ssl-target-name-override: peer0.${ORG_NAME}.share.com
+      hostnameOverride: peer0.${ORG_NAME}.share.com
+  peer1.${ORG_NAME}.share.com:
+    url: grpcs://localhost:${P1PORT}
+    tlsCACerts:
+      pem: |
+        ${PEERPEM}
+    grpcOptions:
+      ssl-target-name-override: peer1.${ORG_NAME}.share.com
+      hostnameOverride: peer1.${ORG_NAME}.share.com
+certificateAuthorities:
+  ca.${ORG_NAME}.share.com:
+    url: https://localhost:${CAPORT}
+    caName: ca-${ORG_NAME}
+    tlsCACerts:
+      pem: |
+        ${CAPEM}
+    httpOptions:
+      verify: false
