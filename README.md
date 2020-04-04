@@ -19,10 +19,12 @@ Make sure you have installed
 7. node-js
 
 **Note:** for setting you working space
-- export GOPATH=$HOME/go<br/>
-export PATH=$PATH:$GOPATH/bin<br/>
-working directory cd $GOPATH/src<br/>
-
+```bash
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+#working directory $GOPATH/src
+cd $GOPATH/src
+```
 ## Download Binaries and Docker Images
 
 The installation instructions will utilize `prepare.sh` (available in the fabric repository)
@@ -41,5 +43,25 @@ Note: you need to use roxy for docker hub and git installtion
 curl -sSL https://gist.githubusercontent.com/afrouzMashaykhi/026ab4f4aa825915c2c9d30001da43d6/raw/7b8746e11f8c59cc25580f6776d1da1665068925/prepare.sh | bash -- 2.0.0 1.4.6 0.4.18
 
 ```
-After successfuly installtion you should have list of images that have been installed
-**Note** for running bash you should have proxy for Docker Hub within Iran access Internet.
+After successfuly installtion you should have list of images that have been installed<br/>
+**Note** for running bash you should have proxy for Docker Hub within Iran access Internet.<br/>
+```bash
+#copy bins that generated in fabric-samples/bin to go/bin
+cp -r $GOPATH/src/fabric-samples/bin  $GOPATH/bin
+
+```
+
+## Setup infrastructure of share organizantion
+
+This project setup a cluster of 3 Organizations with Fabric-ca and an orderer with which stores data in couch db.
+ - Share Dealer
+ - Customers
+ - Regulator
+
+ **Working Directory** `$GOPATH/src/fabric-samples/my-network/` 
+
+ ```bash
+
+ ```
+
+
