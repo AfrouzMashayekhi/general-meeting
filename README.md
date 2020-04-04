@@ -10,18 +10,18 @@ intend to use to ensure alignment.
 ## Prerequisties 
 
 Make sure you have installed 
-</br> 1- git
-</br> 2- curl
-</br> 3- docker
-</br> 4- docker-compose
-</br> 5- go
-</br> 6- python
-</br> 7- node.js
-</br>
-for setting you working space
-8-export GOPATH=$HOME/go<br/>
-9-export PATH=$PATH:$GOPATH/bin<br/>
-10- working directory cd $GOPATH/src<br/>
+1. git
+2. curl
+3. docker
+4. docker-compose
+5. go
+6. python
+7. node-js
+
+**Note:** for setting you working space
+- export GOPATH=$HOME/go<br/>
+export PATH=$PATH:$GOPATH/bin<br/>
+working directory cd $GOPATH/src<br/>
 
 ## Download Binaries and Docker Images
 
@@ -41,5 +41,5 @@ Note: you need to use roxy for docker hub and git installtion
 curl -sSL https://gist.githubusercontent.com/afrouzMashaykhi/026ab4f4aa825915c2c9d30001da43d6/raw/7b8746e11f8c59cc25580f6776d1da1665068925/prepare.sh | bash -- 2.0.0 1.4.6 0.4.18
 
 ```
-After successfuly installtion you should have 
-
+After successfuly installtion you should have list of images that have been installed
+**Note** for running bash you should have proxy for Docker Hub within Iran access Internet.
