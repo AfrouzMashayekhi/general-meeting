@@ -1,5 +1,5 @@
 [//]: # (SPDX-License-Identifier: CC-BY-4.0)
-
+# Installing infrastructure of Hyperledger Fabric v2.0.0
 ## Hyperledger Fabric For General Meeting
 
 Please visit the [installation instructions](https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html)
@@ -16,7 +16,7 @@ Make sure you have installed
 4. docker-compose
 5. go
 6. python
-7. node-js
+7. node.js
 
 **Note:** for setting you working space
 ```bash
@@ -36,10 +36,10 @@ are not passed, the latest available versions will be downloaded.
 The script will also clone fabric-samples repository using the version tag that
 is aligned with the Fabric version.
 
-Note: you need to use roxy for docker hub and git installtion
+Note: you need to use proxy for docker hub and git installtion
 
 ```bash
-#your working space should be GOPATH/src
+#your working space should be $GOPATH/src
 curl -sSL https://gist.githubusercontent.com/afrouzMashaykhi/026ab4f4aa825915c2c9d30001da43d6/raw/7b8746e11f8c59cc25580f6776d1da1665068925/prepare.sh | bash -- 2.0.0 1.4.6 0.4.18
 
 ```
@@ -61,7 +61,16 @@ This project setup a cluster of 3 Organizations with Fabric-ca and an orderer wi
  **Working Directory** `$GOPATH/src/fabric-samples/my-network/` 
 
  ```bash
-
+ cd $GOPATH/src/fabric-samples/my-network/
+ #  setting up nettwork and generate ca for organizations with couchdb
+./network.sh  up -s couchdb -ca -verbose
+# create channel  qith the name of mychannel for the line before
+./network.sh  up createChannel -c mychannel -verbose 
+# note: for tear down the network and cleanup containers run this line
+sudo ./network.sh down
+sudo ./remove.sh
+# for more options of your network you can run
+./network.sh -help
  ```
 
 
