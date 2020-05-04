@@ -41,15 +41,15 @@ Organizations:
                 Type: Signature
                 Rule: "OR('OrdererMSP.admin')"
 
-    - &Customer
+    - &Trader
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: CustomerMSP
+        Name: TraderMSP
 
         # ID to load the MSP definition as
-        ID: CustomerMSP
+        ID: TraderMSP
 
-        MSPDir: ../organizations/peerOrganizations/customer.share.com/msp
+        MSPDir: ../organizations/peerOrganizations/trader.share.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -57,23 +57,23 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('CustomerMSP.admin', 'CustomerMSP.peer', 'CustomerMSP.client')"
+                Rule: "OR('TraderMSP.admin', 'TraderMSP.peer', 'TraderMSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('CustomerMSP.admin', 'CustomerMSP.client')"
+                Rule: "OR('TraderMSP.admin', 'TraderMSP.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('CustomerMSP.admin')"
+                Rule: "OR('TraderMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('CustomerMSP.peer')"
+                Rule: "OR('TraderMSP.peer')"
 
         # leave this flag set to true.
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.customer.share.com
+            - Host: peer0.trader.share.com
               Port: 7051
 
     - &Regulator
@@ -110,15 +110,15 @@ Organizations:
             - Host: peer0.regulator.share.com
               Port: 9051
 
-    - &Sharedealer
+    - &Company
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: SharedealerMSP
+        Name: CompanyMSP
 
         # ID to load the MSP definition as
-        ID: SharedealerMSP
+        ID: CompanyMSP
 
-        MSPDir: ../organizations/peerOrganizations/sharedealer.share.com/msp
+        MSPDir: ../organizations/peerOrganizations/company.share.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -126,22 +126,22 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('SharedealerMSP.admin', 'SharedealerMSP.peer', 'SharedealerMSP.client')"
+                Rule: "OR('CompanyMSP.admin', 'CompanyMSP.peer', 'CompanyMSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('SharedealerMSP.admin', 'SharedealerMSP.client')"
+                Rule: "OR('CompanyMSP.admin', 'CompanyMSP.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('SharedealerMSP.admin')"
+                Rule: "OR('CompanyMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('SharedealerMSP.peer')"
+                Rule: "OR('CompanyMSP.peer')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.sharedealer.share.com
+            - Host: peer0.company.share.com
               Port: 11051
 ################################################################################
 #
@@ -352,17 +352,17 @@ Profiles:
         Consortiums:
             SampleConsortium:
                 Organizations:
-                    - *Customer
+                    - *Trader
                     - *Regulator
-                    - *Sharedealer
+                    - *Company
     TwoOrgsChannel:
         Consortium: SampleConsortium
         <<: *ChannelDefaults
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *Customer
+                - *Trader
                 - *Regulator
-                - *Sharedealer
+                - *Company
             Capabilities:
                 <<: *ApplicationCapabilities

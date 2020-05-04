@@ -237,12 +237,12 @@ ldap:
 # which are always stored in lower case.
 #############################################################################
 affiliations:
-   customer:
+   trader:
       - department1
       - department2
    regulator:
       - department1
-   sharedealer:
+   company:
       - department1
 
 #############################################################################

@@ -20,7 +20,7 @@ is considered.
 The primary use case for this chaincode data model design is for applications in which a particular asset has an associated amount that is
 frequently added to or removed from. For example, with a bank or credit card account, money is either paid to or paid out of it, and the amount
 of money in the account is the result of all of these additions and subtractions aggregated together. A typical person's bank account may not be
-used frequently enough to require highly-parallel throughput, but an organizational account used to store the money collected from customers on an
+used frequently enough to require highly-parallel throughput, but an organizational account used to store the money collected from Trader on an
 e-commerce platform may very well receive a very high number of transactions from all over the world all at once. In fact, this use case is the only
 use case for crypto currencies like Bitcoin: a user's unspent transaction output (UTXO) is the result of all transactions he or she has been a part of
 since joining the blockchain. Other use cases that can employ this technique might be IOT sensors which frequently update their sensed value in the
@@ -38,7 +38,7 @@ advantages and disadvantages of such a system, and how to overcome them.
 Boxer Construction Analysts is an IOT company focused on enabling real-time monitoring of large, expensive assets (machinery) on commercial
 construction projects. They've partnered with the only construction vehicle company in New York, Condor Machines Inc., to provide a reliable,
 auditable, and replayable monitoring system on their machines. This allows Condor to monitor their machines and address problems as soon as
-they occur while providing end-users with a transparent report on machine health, which helps keep the customers satisfied.
+they occur while providing end-users with a transparent report on machine health, which helps keep the Trader satisfied.
 
 The vehicles are outfitted with many sensors each of which broadcasts updated values at frequencies ranging from several times a second to
 several times a minute. Boxer initially sets up their chaincode so that the central machine computer pushes these values out to the blockchain
@@ -67,7 +67,7 @@ strategies to accommodate high-throughput storage model design.
 
 To solve throughput, this new storage model is leveraged to allow every user performing transactions against the account to make that transaction in terms
 of a delta. For example, global e-commerce company America Inc. must be able to accept thousands of transactions an hour in order to keep up with
-their customer's demands. Rather than attempt to update a single row with the total amount of money in America Inc's account, Robinson Credit Co.
+their trader's demands. Rather than attempt to update a single row with the total amount of money in America Inc's account, Robinson Credit Co.
 accepts each transaction as an additive delta to America Inc's account. At the end of the day, America Inc's accounting department can quickly
 retrieve the total value in the account when the sums are aggregated.
 
@@ -80,13 +80,13 @@ Solution 1 involves polling the aggregate value regularly. This happens separate
 service setup by Robinson themselves so that they can at least be guaranteed that if an overdraw does occur, they can detect it within a known
 number of seconds and respond to it appropriately (e.g. by temporarily shutting off transactions on that account), all of which can be automated.
 Furthermore, thanks to the decentralized nature of Fabric, this operation can be performed on a peer dedicated to this function that would not
-slow down or impact the performance of peers processing customer transactions.
+slow down or impact the performance of peers processing trader transactions.
 
 Solution 2 involves breaking up the submission and verification steps of the balance transfer. Balance transfer submissions happen very quickly
 and don't bother with checking overdrawing. However, a secondary process reviews each transaction sent to the chain and keeps a running total,
 verifying that none of them overdraw the account, or at the very least that aggregated withdrawals vs deposits balance out at the end of the day.
 Similar to Solution 1, this system would run separate from any transaction processing hardware and would not incur a performance hit on the
-customer-facing chain.
+trader-facing chain.
 
 Solution 3 involves individually tailoring the smart contracts between Robinson and America Inc, leveraging the power of chaincode to customize
 spending limits based on solvency proofs. Perhaps a limit is set on withdrawal transactions such that anything below \$1000 is automatically processed

@@ -30,16 +30,16 @@ function yaml_ccp {
         organizations/ccp-template.yaml | sed -e $'s/\\\\n/\\\n        /g'
 }
 
-ORG=Customer
-ORG_NAME=customer
+ORG=Trader
+ORG_NAME=trader
 P0PORT=7051
 P1PORT=8051
 CAPORT=7054
-PEERPEM=organizations/peerOrganizations/customer.share.com/tlsca/tlsca.customer.share.com-cert.pem
-CAPEM=organizations/peerOrganizations/customer.share.com/ca/ca.customer.share.com-cert.pem
+PEERPEM=organizations/peerOrganizations/trader.share.com/tlsca/tlsca.trader.share.com-cert.pem
+CAPEM=organizations/peerOrganizations/trader.share.com/ca/ca.trader.share.com-cert.pem
 
-echo "$(json_ccp $ORG $ORG_NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/customer.share.com/connection-customer.json
-echo "$(yaml_ccp $ORG $ORG_NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/customer.share.com/connection-customer.yaml
+echo "$(json_ccp $ORG $ORG_NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/trader.share.com/connection-trader.json
+echo "$(yaml_ccp $ORG $ORG_NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/trader.share.com/connection-trader.yaml
 
 ORG=Regulator
 ORG_NAME=regulator
@@ -52,13 +52,13 @@ CAPEM=organizations/peerOrganizations/regulator.share.com/ca/ca.regulator.share.
 echo "$(json_ccp $ORG $ORG_NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/regulator.share.com/connection-regulator.json
 echo "$(yaml_ccp $ORG $ORG_NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/regulator.share.com/connection-regulator.yaml
 
-ORG=Sharedealer
-ORG_NAME=sharedealer
+ORG=Company
+ORG_NAME=company
 P0PORT=11051
 P1PORT=12051
 CAPORT=10054
-PEERPEM=organizations/peerOrganizations/sharedealer.share.com/tlsca/tlsca.sharedealer.share.com-cert.pem
-CAPEM=organizations/peerOrganizations/sharedealer.share.com/ca/ca.sharedealer.share.com-cert.pem
+PEERPEM=organizations/peerOrganizations/company.share.com/tlsca/tlsca.company.share.com-cert.pem
+CAPEM=organizations/peerOrganizations/company.share.com/ca/ca.company.share.com-cert.pem
 
-echo "$(json_ccp $ORG $ORG_NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/sharedealer.share.com/connection-sharedealer.json
-echo "$(yaml_ccp $ORG $ORG_NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/sharedealer.share.com/connection-sharedealer.yaml
+echo "$(json_ccp $ORG $ORG_NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/company.share.com/connection-company.json
+echo "$(yaml_ccp $ORG $ORG_NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/company.share.com/connection-company.yaml

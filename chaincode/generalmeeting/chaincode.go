@@ -27,44 +27,40 @@ import (
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
-// SmartContract provides functions for managing a car
+// SmartContract provides functions for managing a stock
 type SmartContract struct {
 	contractapi.Contract
 }
 
-// Car describes basic details of what makes up a car
-type Car struct {
-	Make   string `json:"make"`
-	Model  string `json:"model"`
-	Colour string `json:"colour"`
-	Owner  string `json:"owner"`
+// stock describes basic details of what makes up a stock
+type Stock struct {
+	Owner   string `json:"owner"`
+	Company  string `json:"company"`
+	StockType string `json:"stockType"`
+	IssueDate  string `json:"issueDare"`
+	StockID string `json:"stockID"`
+	Value string `"json:value"`
+    IssueTime
+	CurrentState
+	StockName
 }
 
 // QueryResult structure used for handling result of query
 type QueryResult struct {
 	Key    string `json:"Key"`
-	Record *Car
+	Record *Stock
 }
 
-// InitLedger adds a base set of cars to the ledger
+// InitLedger adds a base set of stock to the ledger
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
-	cars := []Car{
-		Car{Make: "Toyota", Model: "Prius", Colour: "blue", Owner: "Tomoko"},
-		Car{Make: "Ford", Model: "Mustang", Colour: "red", Owner: "Brad"},
-		Car{Make: "Hyundai", Model: "Tucson", Colour: "green", Owner: "Jin Soo"},
-		Car{Make: "Volkswagen", Model: "Passat", Colour: "yellow", Owner: "Max"},
-		Car{Make: "Tesla", Model: "S", Colour: "black", Owner: "Adriana"},
-		Car{Make: "Peugeot", Model: "205", Colour: "purple", Owner: "Michel"},
-		Car{Make: "Chery", Model: "S22L", Colour: "white", Owner: "Aarav"},
-		Car{Make: "Fiat", Model: "Punto", Colour: "violet", Owner: "Pari"},
-		Car{Make: "Tata", Model: "Nano", Colour: "indigo", Owner: "Valeria"},
-		Car{Make: "Holden", Model: "Barina", Colour: "brown", Owner: "Shotaro"},
+	stocks := []Stock{
+		Stock{Make: "Toyota", Model: "Prius", Colour: "blue", Owner: "Tomoko"},
 	}
 
-	for i, car := range cars {
-		carAsBytes, _ := json.Marshal(car)
+	for i, stock := range stocks {
+		stockAsBytes, _ := json.Marshal(stock)
 		// put in world state
-		err := ctx.GetStub().PutState("CAR"+strconv.Itoa(i), carAsBytes)
+		err := ctx.GetStub().PutState("Stock"+strconv.Itoa(i), stockAsBytes)
 
 		if err != nil {
 			return fmt.Errorf("Failed to put to world state. %s", err.Error())
@@ -74,7 +70,7 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	return nil
 }
 
-// CreateCar adds a new car to the world state with given details
+// CreateStock adds a new stock to the world state with given details
 func (s *SmartContract) CreateCar(ctx contractapi.TransactionContextInterface, carNumber string, make string, model string, colour string, owner string) error {
 	car := Car{
 		Make:   make,
@@ -138,18 +134,18 @@ func (s *SmartContract) QueryAllCars(ctx contractapi.TransactionContextInterface
 }
 
 // ChangeCarOwner updates the owner field of car with given id in world state
-func (s *SmartContract) ChangeCarOwner(ctx contractapi.TransactionContextInterface, carNumber string, newOwner string) error {
-	car, err := s.QueryCar(ctx, carNumber)
+func (s *SmartContract) ChangeStockOwner(ctx contractapi.TransactionContextInterface, StockID string, newOwner string) error {
+	stock, err := s.QueryStock(ctx, stockID)
 
 	if err != nil {
 		return err
 	}
 
-	car.Owner = newOwner
+	stock.Owner = newOwner
 
-	carAsBytes, _ := json.Marshal(car)
+	stockAsBytes, _ := json.Marshal(stock)
 
-	return ctx.GetStub().PutState(carNumber, carAsBytes)
+	return ctx.GetStub().PutState(stockID, stockAsBytes)
 }
 
 func main() {
@@ -157,11 +153,11 @@ func main() {
 	chaincode, err := contractapi.NewChaincode(new(SmartContract))
 
 	if err != nil {
-		fmt.Printf("Error create fabcar chaincode: %s", err.Error())
+		fmt.Printf("Error create generalmeeting chaincode: %s", err.Error())
 		return
 	}
 
 	if err := chaincode.Start(); err != nil {
-		fmt.Printf("Error starting fabcar chaincode: %s", err.Error())
+		fmt.Printf("Error starting generalmeeting chaincode: %s", err.Error())
 	}
 }

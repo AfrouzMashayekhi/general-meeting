@@ -80,7 +80,7 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name: SharedealerCA
+  name: CompanyCA
   # Key file (is only used to import a private key into BCCSP)
   keyfile:
   # Certificate file (default: ca-cert.pem)
@@ -237,12 +237,12 @@ ldap:
 # which are always stored in lower case.
 #############################################################################
 affiliations:
-   customer:
+   trader:
       - department1
       - department2
    regulator:
       - department1
-   sharedealer:
+   company:
       - department1
 
 #############################################################################
@@ -303,16 +303,16 @@ signing:
 #     CA certificates though it can still issue end entity certificates.
 ###########################################################################
 csr:
-   cn: ca.sharedealer.share.com
+   cn: ca.company.share.com
    names:
       - C: US
         ST: "North Carolina"
         L: "Durham"
-        O: sharedealer.share.com
+        O: company.share.com
         OU:
    hosts:
      - localhost
-     - sharedealer.share.com
+     - company.share.com
    ca:
       expiry: 131400h
       pathlength: 1

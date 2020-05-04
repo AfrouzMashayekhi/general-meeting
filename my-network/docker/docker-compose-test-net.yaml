@@ -7,9 +7,9 @@ version: '2'
 
 volumes:
   orderer.share.com:
-  peer0.customer.share.com:
+  peer0.trader.share.com:
   peer0.regulator.share.com:
-  peer0.sharedealer.share.com:
+  peer0.company.share.com:
 
 networks:
   test:
@@ -48,8 +48,8 @@ services:
     networks:
       - test
 
-  peer0.customer.share.com:
-    container_name: peer0.customer.share.com
+  peer0.trader.share.com:
+    container_name: peer0.trader.share.com
     image: hyperledger/fabric-peer:$IMAGE_TAG
     environment:
       #Generic peer variables
@@ -68,19 +68,19 @@ services:
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
       # Peer specific variabes
-      - CORE_PEER_ID=peer0.customer.share.com
-      - CORE_PEER_ADDRESS=peer0.customer.share.com:7051
+      - CORE_PEER_ID=peer0.trader.share.com
+      - CORE_PEER_ADDRESS=peer0.trader.share.com:7051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.customer.share.com:7052
+      - CORE_PEER_CHAINCODEADDRESS=peer0.trader.share.com:7052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.customer.share.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.customer.share.com:7051
-      - CORE_PEER_LOCALMSPID=CustomerMSP
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.trader.share.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.trader.share.com:7051
+      - CORE_PEER_LOCALMSPID=TraderMSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/msp:/etc/hyperledger/fabric/msp
-        - ../organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/tls:/etc/hyperledger/fabric/tls
-        - peer0.customer.share.com:/var/hyperledger/production
+        - ../organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/msp:/etc/hyperledger/fabric/msp
+        - ../organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.trader.share.com:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
     ports:
@@ -129,8 +129,8 @@ services:
       - test
 
 
-  peer0.sharedealer.share.com:
-    container_name: peer0.sharedealer.share.com
+  peer0.company.share.com:
+    container_name: peer0.company.share.com
     image: hyperledger/fabric-peer:$IMAGE_TAG
     environment:
       #Generic peer variables
@@ -149,19 +149,19 @@ services:
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
       # Peer specific variabes
-      - CORE_PEER_ID=peer0.sharedealer.share.com
-      - CORE_PEER_ADDRESS=peer0.sharedealer.share.com:11051
+      - CORE_PEER_ID=peer0.company.share.com
+      - CORE_PEER_ADDRESS=peer0.company.share.com:11051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:11051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.sharedealer.share.com:11052
+      - CORE_PEER_CHAINCODEADDRESS=peer0.company.share.com:11052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:11052
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.sharedealer.share.com:11051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.sharedealer.share.com:11051
-      - CORE_PEER_LOCALMSPID=SharedealerMSP
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.company.share.com:11051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.company.share.com:11051
+      - CORE_PEER_LOCALMSPID=CompanyMSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/msp:/etc/hyperledger/fabric/msp
-        - ../organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/tls:/etc/hyperledger/fabric/tls
-        - peer0.sharedealer.share.com:/var/hyperledger/production
+        - ../organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/msp:/etc/hyperledger/fabric/msp
+        - ../organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.company.share.com:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
     ports:

@@ -34,7 +34,7 @@ createChannelTx() {
 
 createAncorPeerTx() {
 
-	for orgmsp in CustomerMSP RegulatorMSP SharedealerMSP; do
+	for orgmsp in TraderMSP RegulatorMSP CompanyMSP; do
 
 	echo "#######    Generating anchor peer update for ${orgmsp}  ##########"
 	set -x
@@ -149,18 +149,18 @@ echo "Creating channel "$CHANNEL_NAME
 createChannel
 
 ## Join all the peers to the channel
-echo "Join Customer peers to the channel..."
+echo "Join Trader peers to the channel..."
 joinChannel 1
 echo "Join Regulator peers to the channel..."
 joinChannel 2
-echo "Join Sharedealer peers to the channel..."
+echo "Join Company peers to the channel..."
 joinChannel 3
 ## Set the anchor peers for each org in the channel
-echo "Updating anchor peers for customer..."
+echo "Updating anchor peers for trader..."
 updateAnchorPeers 1
 echo "Updating anchor peers for regulator..."
 updateAnchorPeers 2
-echo "Updating anchor peers for sharedealer..."
+echo "Updating anchor peers for company..."
 updateAnchorPeers 3
 echo
 echo "========= Channel successfully joined =========== "
