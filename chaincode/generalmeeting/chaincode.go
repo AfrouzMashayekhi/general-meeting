@@ -33,17 +33,7 @@ type SmartContract struct {
 }
 
 // stock describes basic details of what makes up a stock
-type Stock struct {
-	Owner   string `json:"owner"`
-	Company  string `json:"company"`
-	StockType string `json:"stockType"`
-	IssueDate  string `json:"issueDare"`
-	StockID string `json:"stockID"`
-	Value string `"json:value"`
-    IssueTime
-	CurrentState
-	StockName
-}
+
 
 // QueryResult structure used for handling result of query
 type QueryResult struct {
