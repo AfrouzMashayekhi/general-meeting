@@ -1,13 +1,13 @@
-package generalmeeting
+package stockMarket
 
 type IndividualTrader struct {
-	fullName string
-	traderID string
-	shares []Share
-	balance int
+	fullName     string
+	traderID     string
+	shares       []Share
+	balance      int
 	blockedMoney int
 	//state AccountState
-    //username string
+	//username string
 	//password string
 }
 

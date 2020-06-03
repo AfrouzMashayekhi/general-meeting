@@ -1,11 +1,10 @@
-package generalmeeting
+package stockMarket
 
 type CorporateTrader struct {
 	companyName string
-	shares []Share
-	compnayID string
+	shares      []Share
+	compnayID   string
 	stockSymbol string
-
 }
 
 //func () BuyShare()
@@ -18,4 +17,4 @@ type CorporateTrader struct {
 ////query all shares of trader
 //func () QueryAllTraderShares ()
 // initial public offer ()
-func () InitialPublicOffer () {}
+//func (c *CorporateTrader) InitialPublicOffer() {}
