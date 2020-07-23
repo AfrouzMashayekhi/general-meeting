@@ -1,5 +1,7 @@
 package stockMarket
 
+// each object should contains its own contract means its own involke and initledger
+
 type Trader interface {
 	/*buy sale or aniything that a trader do*/
 	//func () BuyShare()
