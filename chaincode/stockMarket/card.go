@@ -18,24 +18,3 @@ type DividendPayment struct {
 	PaymentRate float32   `json:"paymentRate"`
 	PaymentDate date.Date `json:"paymentDate"`
 }
-
-//func () ChangeShareOwner() {
-//
-//}
-//
-//// // initial public offering or
-////func () CreateShare ()
-//func () ChangeStockOpeningPrice() {
-//
-//}
-//
-//func () ChangeStockClosingPrince() {
-//
-//}
-//
-//func () ChangeStockLowestPrice() {}
-//
-//func () ChangeStockHighestPRice() {}
-//
-//func () ChangeStockState() {}
-//func () CreateStock()      {}
