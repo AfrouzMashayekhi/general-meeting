@@ -1,10 +1,8 @@
 package stockMarket
 
-type CorporateTrader struct {
-	companyName string
-	compnayID   string
-	shares      []Share
-	stock       Stock
+type Issuer struct {
+	CompanyName string `json:"companyName"`
+	StockSymbol string `json:"stockSymbol"`
 }
 
 //func () BuyShare()
@@ -16,6 +14,4 @@ type CorporateTrader struct {
 //func () QueryTraderShare ()
 ////query all shares of trader
 //func () QueryAllTraderShares ()
-// initial public offer () create shares and putstate shares
-//func (c *CorporateTrader) InitialPublicOffer() {}
-// func stoc
+// initial public offer ()
