@@ -1,19 +1,24 @@
 package stockMarket
 
-import "google.golang.org/genproto/googleapis/type/date"
+import (
+	"time"
+)
 
+// Issuer is a company that validate and pays Dividend and holds General Meetings
 type Issuer struct {
 	CompanyName string `json:"companyName"`
 	StockSymbol string `json:"stockSymbol"`
 }
 
+// ValidateCard Func Validates traders cards if they own this company share or not
 func (i *Issuer) ValidateCard(card Card) bool {
 	//validate Card
 	return false
 }
 
+// GeneralMeeting Func took place and add card to shareholders for dividend
 func (i *Issuer) GeneralMeeting() {
-	cards := QueryCardByIssuer(*i)
+	cards := QueryByIssuer(*i)
 	for _, card := range cards {
 		//updateCard(nil,nil)
 		//get trader and update cardlist
@@ -21,11 +26,12 @@ func (i *Issuer) GeneralMeeting() {
 	}
 }
 
-func (i *Issuer) PayCard(payDate date.Date) {
-	cards := QueryCardByIssuer(*i)
+// PayCard Func at the time of payDate
+func (i *Issuer) PayCard(payDate time.Time) {
+	cards := QueryByIssuer(*i)
 	for _, card := range cards {
-		for _, dDate := range card.DividendPayment {
-			if dDate.PDate.String() == payDate.String() {
+		for _, dDate := range card.DividendPayments {
+			if dDate.PDate.Equal(payDate) {
 				dDate.Paid = true
 
 			}
