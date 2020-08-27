@@ -1,4 +1,4 @@
-package stockMarket
+package sdk
 
 import (
 	"time"
@@ -12,7 +12,7 @@ type Issuer struct {
 
 // ValidateCard Func Validates traders cards if they own this company share or not
 func (i *Issuer) ValidateCard(card Card) bool {
-	//validate Card
+	//todo:validate Card
 	return false
 }
 

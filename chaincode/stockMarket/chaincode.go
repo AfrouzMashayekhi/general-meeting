@@ -18,13 +18,3 @@
  */
 //Package stockMarket define Stock market Objects
 package stockMarket
-
-import (
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-)
-
-// each object should contains its own contract means its own involke and initledger
-// StockContract contract for handling writing and reading from the world state
-type StockContract struct {
-	contractapi.Contract
-}

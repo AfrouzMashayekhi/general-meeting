@@ -1,4 +1,4 @@
-package stockMarket
+package sdk
 
 import "errors"
 
@@ -6,14 +6,14 @@ import "errors"
 type Trader struct {
 	// Cards is  a list of Trader's cards which have info of dividend and its pays
 	Cards []Card `json:"cards"`
-	// TraderID si a unique ID for every trader who register in this market
+	// TraderID is a unique ID for every trader who register in this market
 	TraderID int `json:"traderID"`
 	//CardStatus []CardStatus `json:"cardstatus"`
 }
 
 // TraderRegistration func is called when someone want to join the market
 func TraderRegistration(TraderID int) Trader {
-
+	// todo: constructor
 	return Trader{nil, TraderID}
 }
 
@@ -21,7 +21,7 @@ func TraderRegistration(TraderID int) Trader {
 func (t *Trader) InitiateTraderCards(cards []Card) error {
 	for _, card := range cards {
 		if card.Issuer.ValidateCard(card) == true {
-			//AddCard(card)
+			//todo:AddCard(card)
 		} else {
 			return errors.New("card's owner didn't validate by issuer")
 		}
