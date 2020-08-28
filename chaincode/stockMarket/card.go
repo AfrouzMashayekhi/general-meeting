@@ -39,8 +39,25 @@ type DividendPayment struct {
 	Paid bool `json:"paid"`
 }
 
-func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface) {
+// QueryResult structure used for handling result of query
+type QueryResult struct {
+	Key    string `json:"Key"`
+	Record *Card
+}
+
+// InitLedger create all cards with TraderID and Issuer and other attr nil
+func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	// todo: get all trader id and issuer id and make card calls AddCard function
+	// todo: for now just add some static issuer trader
+	cards := []Card{}
+	for _, card := range cards {
+		err := sc.AddCard(ctx, card)
+		if err != nil {
+			return fmt.Errorf("failed to init Cards %s", err.Error())
+		}
+	}
+	return nil
+
 }
 
 // AddCard calls putState of chaincode to add card maybe create a string to push in worldstate
@@ -68,11 +85,48 @@ func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, ca
 //	return nil
 //}
 
-func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterface, traderID string) []Card {
+func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterface, traderID string) ([]QueryResult, error) {
+	traderIterator, err := ctx.GetStub().GetStateByPartialCompositeKey("trader~stocksymbol", []string{traderID})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get Cards of trader %s", err.Error())
+	}
+	defer traderIterator.Close()
+	cards := []QueryResult{}
+	for traderIterator.HasNext() {
+		response, err := traderIterator.Next()
+		if err != nil {
+			return nil, err
+		}
+		card := new(Card)
+		_ = json.Unmarshal(response.Value, card)
+		result := QueryResult{Key: response.Key, Record: card}
+		cards = append(cards, result)
+
+	}
+	return cards, nil
 
 }
 
-func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextInterface, stockSymbol string) []Card {
+func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextInterface, stockSymbol string) ([]QueryResult, error) {
+	queryString := fmt.Sprintf("{\"selector\":{\"stockSymbol\":\"%s\"}}", stockSymbol)
+	ssymbolIterator, err := ctx.GetStub().GetQueryResult(queryString)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get Cards of stock symbol %s", err.Error())
+	}
+	defer ssymbolIterator.Close()
+	cards := []QueryResult{}
+	for ssymbolIterator.HasNext() {
+		response, err := ssymbolIterator.Next()
+		if err != nil {
+			return nil, err
+		}
+		card := new(Card)
+		_ = json.Unmarshal(response.Value, card)
+		result := QueryResult{Key: response.Key, Record: card}
+		cards = append(cards, result)
+
+	}
+	return cards, nil
 
 }
 
@@ -83,16 +137,49 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 }
 
 func (sc *StockContract) UpdateCount(ctx contractapi.TransactionContextInterface, card Card, countChange int) error {
-	// todo:get card
-	// todo:change count
-	// todo:putcard
-
+	indexName := "trader~stocksymbol"
+	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
+	response, err := ctx.GetStub().GetState(cardKey)
+	if err != nil {
+		return fmt.Errorf("failed to get Card from world state %s", err.Error())
+	}
+	if response == nil {
+		return fmt.Errorf("not such a card in worldstate")
+	}
+	responseCard := new(Card)
+	_ = json.Unmarshal(response, responseCard)
+	responseCard.Count += countChange
+	if responseCard.Count <= 0 {
+		fmt.Errorf("can't update count the count will be negative ")
+	}
+	cardAsByte, _ := json.Marshal(responseCard)
+	err = ctx.GetStub().PutState(cardKey, cardAsByte)
+	if err != nil {
+		return fmt.Errorf("failed to put Card to world state %s", err.Error())
+	}
+	return nil
 }
 func (sc *StockContract) UpdateDividendPayment(ctx contractapi.TransactionContextInterface, card Card, dPayment DividendPayment) error {
 	// todo:get card
 	// change edpayment attributes
 }
 func (sc *StockContract) AddDividendPayment(ctx contractapi.TransactionContextInterface, card Card, dPayment DividendPayment) error {
-	// todo:get card
-	// add dpayment
+	indexName := "trader~stocksymbol"
+	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
+	response, err := ctx.GetStub().GetState(cardKey)
+	if err != nil {
+		return fmt.Errorf("failed to get Card from world state %s", err.Error())
+	}
+	if response == nil {
+		return fmt.Errorf("not such a card in worldstate")
+	}
+	responseCard := new(Card)
+	_ = json.Unmarshal(response, responseCard)
+	responseCard.DividendPayments = append(responseCard.DividendPayments, dPayment)
+	cardAsByte, _ := json.Marshal(responseCard)
+	err = ctx.GetStub().PutState(cardKey, cardAsByte)
+	if err != nil {
+		return fmt.Errorf("failed to put Card to world state %s", err.Error())
+	}
+	return nil
 }
