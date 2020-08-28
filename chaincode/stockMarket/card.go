@@ -35,8 +35,8 @@ type DividendPayment struct {
 	Percentage float32 `json:"percentage"`
 	// PDate date of payment
 	PDate time.Time `json:"pDate"`
-	// for changing status of
-	Paid bool `json:"paid"`
+	//// for changing status of NOT NEEDED I THINK IF  PAYING IS OUT OF BLOCKCHAIN JUST QUERY ISSUER
+	//Paid bool `json:"paid"`
 }
 
 // QueryResult structure used for handling result of query
@@ -132,11 +132,47 @@ func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextIn
 
 func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, seller string, buyer string, count int, stockSymbol string) error {
 	// todo: get seller+ stock
-	//todo: if updateCard count  and dividend payment
+	indexName := "trader~stocksymbol"
+	sellerCardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{seller, stockSymbol})
+	sellerResponse, err := ctx.GetStub().GetState(sellerCardKey)
+	if err != nil {
+		return fmt.Errorf("failed to get Card from world state %s", err.Error())
+	}
+	if sellerResponse == nil {
+		return fmt.Errorf("not such a card in worldstate")
+	}
+	sellerResponseCard := new(Card)
+	_ = json.Unmarshal(sellerResponse, sellerResponseCard)
+	// add it here cause its refrence and maybe deleted in calling update coutn
+	dividendPaymentCard := sellerResponseCard.DividendPayments
+	// negative the number
+	err = sc.updateCount(ctx, sellerResponseCard, -count)
+	if err != nil {
+		return fmt.Errorf("can't sell card update count ")
+	}
+	//todo: if updateCard count  and dividend payment do I need to update dividend payment if zero so not added?
+	// but maybe again she buy it again so clear it up? if zero?
 	//todo:add count and dividentPayment to buyer
+	buyerCardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{buyer, stockSymbol})
+	buyerResponse, err := ctx.GetStub().GetState(buyerCardKey)
+	if err != nil {
+		return fmt.Errorf("failed to get Card from world state %s", err.Error())
+	}
+	buyerResponseCard := new(Card)
+	_ = json.Unmarshal(buyerResponse, buyerResponseCard)
+	// negative the number
+	err = sc.updateCount(ctx, buyerResponseCard, count)
+	if err != nil {
+		return fmt.Errorf("can't buy card update count")
+	}
+	err = sc.addDividendPayment(ctx, buyerResponseCard, dividendPaymentCard)
+	if err != nil {
+		return fmt.Errorf("can't buy card update dpayment")
+	}
+	return nil
 }
 
-func (sc *StockContract) UpdateCount(ctx contractapi.TransactionContextInterface, card Card, countChange int) error {
+func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface, card *Card, countChange int) error {
 	indexName := "trader~stocksymbol"
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
 	response, err := ctx.GetStub().GetState(cardKey)
@@ -150,20 +186,21 @@ func (sc *StockContract) UpdateCount(ctx contractapi.TransactionContextInterface
 	_ = json.Unmarshal(response, responseCard)
 	responseCard.Count += countChange
 	if responseCard.Count <= 0 {
-		fmt.Errorf("can't update count the count will be negative ")
+		return fmt.Errorf("can't update count the count will be negative ")
 	}
-	cardAsByte, _ := json.Marshal(responseCard)
-	err = ctx.GetStub().PutState(cardKey, cardAsByte)
-	if err != nil {
-		return fmt.Errorf("failed to put Card to world state %s", err.Error())
+	if responseCard.Count == 0 {
+		sc.deleteDividendPayment(ctx, responseCard)
+	} else {
+		cardAsByte, _ := json.Marshal(responseCard)
+		err = ctx.GetStub().PutState(cardKey, cardAsByte)
+		if err != nil {
+			return fmt.Errorf("failed to put Card to world state %s", err.Error())
+		}
 	}
 	return nil
 }
-func (sc *StockContract) UpdateDividendPayment(ctx contractapi.TransactionContextInterface, card Card, dPayment DividendPayment) error {
-	// todo:get card
-	// change edpayment attributes
-}
-func (sc *StockContract) AddDividendPayment(ctx contractapi.TransactionContextInterface, card Card, dPayment DividendPayment) error {
+
+func (sc *StockContract) addDividendPayment(ctx contractapi.TransactionContextInterface, card *Card, dPayments []DividendPayment) error {
 	indexName := "trader~stocksymbol"
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
 	response, err := ctx.GetStub().GetState(cardKey)
@@ -175,7 +212,30 @@ func (sc *StockContract) AddDividendPayment(ctx contractapi.TransactionContextIn
 	}
 	responseCard := new(Card)
 	_ = json.Unmarshal(response, responseCard)
-	responseCard.DividendPayments = append(responseCard.DividendPayments, dPayment)
+	for _, dPayment := range dPayments {
+		responseCard.DividendPayments = append(responseCard.DividendPayments, dPayment)
+	}
+	cardAsByte, _ := json.Marshal(responseCard)
+	err = ctx.GetStub().PutState(cardKey, cardAsByte)
+	if err != nil {
+		return fmt.Errorf("failed to put Card to world state %s", err.Error())
+	}
+	return nil
+}
+
+func (sc *StockContract) deleteDividendPayment(ctx contractapi.TransactionContextInterface, card *Card) error {
+	indexName := "trader~stocksymbol"
+	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
+	response, err := ctx.GetStub().GetState(cardKey)
+	if err != nil {
+		return fmt.Errorf("failed to get Card from world state %s", err.Error())
+	}
+	if response == nil {
+		return fmt.Errorf("not such a card in worldstate")
+	}
+	responseCard := new(Card)
+	_ = json.Unmarshal(response, responseCard)
+	responseCard.DividendPayments = nil
 	cardAsByte, _ := json.Marshal(responseCard)
 	err = ctx.GetStub().PutState(cardKey, cardAsByte)
 	if err != nil {
