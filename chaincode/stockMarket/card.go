@@ -131,7 +131,6 @@ func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextIn
 }
 
 func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, seller string, buyer string, count int, stockSymbol string) error {
-	// todo: get seller+ stock
 	indexName := "trader~stocksymbol"
 	sellerCardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{seller, stockSymbol})
 	sellerResponse, err := ctx.GetStub().GetState(sellerCardKey)
@@ -152,7 +151,6 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	}
 	//todo: if updateCard count  and dividend payment do I need to update dividend payment if zero so not added?
 	// but maybe again she buy it again so clear it up? if zero?
-	//todo:add count and dividentPayment to buyer
 	buyerCardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{buyer, stockSymbol})
 	buyerResponse, err := ctx.GetStub().GetState(buyerCardKey)
 	if err != nil {
