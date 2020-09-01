@@ -1,4 +1,4 @@
-package stockMarket
+package main
 
 import (
 	"encoding/json"
@@ -49,7 +49,17 @@ type QueryResult struct {
 func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	// todo: get all trader id and issuer id and make card calls AddCard function
 	// todo: for now just add some static issuer trader
-	cards := []Card{}
+	cards := []Card{
+		{TraderID: "1", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
+		{TraderID: "1", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
+		{TraderID: "1", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
+		{TraderID: "2", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
+		{TraderID: "2", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
+		{TraderID: "2", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
+		{TraderID: "3", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
+		{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
+		{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
+	}
 	for _, card := range cards {
 		err := sc.AddCard(ctx, card)
 		if err != nil {
@@ -60,11 +70,12 @@ func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface)
 
 }
 
+//todo: new trader register for adding cards, new issuer register, for dividend update it?
+
 // AddCard calls putState of chaincode to add card maybe create a string to push in worldstate
 func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, card Card) error {
 	indexName := "trader~stocksymbol"
 	cardAsByte, _ := json.Marshal(card)
-	// todo: error handling
 	// todo: validate by issuer is handeled here?
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
 	err := ctx.GetStub().PutState(cardKey, cardAsByte)
@@ -142,7 +153,7 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	}
 	sellerResponseCard := new(Card)
 	_ = json.Unmarshal(sellerResponse, sellerResponseCard)
-	// add it here cause its refrence and maybe deleted in calling update coutn
+	// add it here cause its refrence and maybe deleted in calling update count
 	dividendPaymentCard := sellerResponseCard.DividendPayments
 	// negative the number
 	err = sc.updateCount(ctx, sellerResponseCard, -count)
@@ -186,6 +197,7 @@ func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface
 	if responseCard.Count <= 0 {
 		return fmt.Errorf("can't update count the count will be negative ")
 	}
+	// if not deleted buying another card maybe cause problem
 	if responseCard.Count == 0 {
 		sc.deleteDividendPayment(ctx, responseCard)
 	} else {
@@ -240,4 +252,18 @@ func (sc *StockContract) deleteDividendPayment(ctx contractapi.TransactionContex
 		return fmt.Errorf("failed to put Card to world state %s", err.Error())
 	}
 	return nil
+}
+
+func main() {
+
+	chaincode, err := contractapi.NewChaincode(new(StockContract))
+
+	if err != nil {
+		fmt.Printf("Error create stock chaincode: %s", err.Error())
+		return
+	}
+
+	if err := chaincode.Start(); err != nil {
+		fmt.Printf("Error starting stock chaincode: %s", err.Error())
+	}
 }

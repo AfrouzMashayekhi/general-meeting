@@ -17,4 +17,4 @@
  * under the License.
  */
 //Package stockMarket define Stock market Objects
-package stockMarket
+package main
