@@ -50,18 +50,18 @@ func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface)
 	// todo: get all trader id and issuer id and make card calls AddCard function
 	// todo: for now just add some static issuer trader
 	cards := []Card{
-		{TraderID: "1", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: make([]DividendPayment, 0)},
-		{TraderID: "1", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: make([]DividendPayment, 0)},
-		{TraderID: "1", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: make([]DividendPayment, 0)},
-		{TraderID: "2", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: make([]DividendPayment, 0)},
-		{TraderID: "2", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: make([]DividendPayment, 0)},
-		{TraderID: "2", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: make([]DividendPayment, 0)},
-		{TraderID: "3", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: make([]DividendPayment, 0)},
-		{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: make([]DividendPayment, 0)},
-		{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: make([]DividendPayment, 0)},
+		{TraderID: "1", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
+		{TraderID: "1", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
+		{TraderID: "1", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
+		{TraderID: "2", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
+		{TraderID: "2", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
+		{TraderID: "2", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
+		{TraderID: "3", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
+		{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
+		{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
 	}
 	for _, card := range cards {
-		err := sc.AddCard(ctx, card)
+		err := sc.AddCard(ctx, card.TraderID, card.Count, card.StockSymbol, card.Dividend)
 		if err != nil {
 			return fmt.Errorf("failed to init Cards %s", err.Error())
 		}
@@ -71,10 +71,13 @@ func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface)
 }
 
 //todo: new trader register for adding cards, new issuer register, for dividend update it?
-
+// change dividend by string? how to array
+// invoke just accept strings
 // AddCard calls putState of chaincode to add card maybe create a string to push in worldstate
-func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, card Card) error {
+func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, traderID string, count int, stocksymbol string, dividend int) error {
+
 	indexName := "trader~stocksymbol"
+	card := Card{TraderID: traderID, Count: count, StockSymbol: stocksymbol, Dividend: dividend, DividendPayments: make([]DividendPayment, 0)}
 	cardAsByte, _ := json.Marshal(card)
 	// todo: validate by issuer is handeled here?
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
@@ -245,7 +248,7 @@ func (sc *StockContract) deleteDividendPayment(ctx contractapi.TransactionContex
 	}
 	responseCard := new(Card)
 	_ = json.Unmarshal(response, responseCard)
-	responseCard.DividendPayments = nil
+	responseCard.DividendPayments = make([]DividendPayment, 0)
 	cardAsByte, _ := json.Marshal(responseCard)
 	err = ctx.GetStub().PutState(cardKey, cardAsByte)
 	if err != nil {
