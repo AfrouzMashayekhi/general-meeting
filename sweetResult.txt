@@ -15,3 +15,8 @@
 2020-09-03 15:19:24.753 +0430 [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001 Chaincode invoke successful. result: status:200 
 /tmp/fabric:$ peer chaincode query -C mychannel -n stock  -c '{"Args":["queryByTrader","1"]}'
 [{"Key":"\u0000trader~stocksymbol\u00001\u0000appl\u0000","Record":{"traderID":"1","count":0,"stockSymbol":"appl","dividend":300,"dividendPayment":[]}},{"Key":"\u0000trader~stocksymbol\u00001\u0000goog\u0000","Record":{"traderID":"1","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}},{"Key":"\u0000trader~stocksymbol\u00001\u0000msft\u0000","Record":{"traderID":"1","count":0,"stockSymbol":"msft","dividend":100,"dividendPayment":[]}}]
+
+/tmp/fabric:$ peer chaincode query -C mychannel -n stock  -c '{"Args":["queryByStockSymbol","goog"]}'
+[{"Key":"\u0000trader~stocksymbol\u00001\u0000goog\u0000","Record":{"traderID":"1","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}},{"Key":"\u0000trader~stocksymbol\u00002\u0000goog\u0000","Record":{"traderID":"2","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}},{"Key":"\u0000trader~stocksymbol\u00003\u0000goog\u0000","Record":{"traderID":"3","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}}]
+/tmp/fabric:$ 
+
