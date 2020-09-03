@@ -50,15 +50,15 @@ func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface)
 	// todo: get all trader id and issuer id and make card calls AddCard function
 	// todo: for now just add some static issuer trader
 	cards := []Card{
-		{TraderID: "1", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-		{TraderID: "1", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-		{TraderID: "1", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
-		{TraderID: "2", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-		{TraderID: "2", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-		{TraderID: "2", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
-		{TraderID: "3", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-		{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-		{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
+		{TraderID: "1", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: make([]DividendPayment, 0)},
+		{TraderID: "1", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: make([]DividendPayment, 0)},
+		{TraderID: "1", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: make([]DividendPayment, 0)},
+		{TraderID: "2", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: make([]DividendPayment, 0)},
+		{TraderID: "2", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: make([]DividendPayment, 0)},
+		{TraderID: "2", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: make([]DividendPayment, 0)},
+		{TraderID: "3", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: make([]DividendPayment, 0)},
+		{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: make([]DividendPayment, 0)},
+		{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: make([]DividendPayment, 0)},
 	}
 	for _, card := range cards {
 		err := sc.AddCard(ctx, card)
