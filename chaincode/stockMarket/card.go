@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"strconv"
 	"time"
 )
 
@@ -60,8 +61,9 @@ func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface)
 		{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
 		{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
 	}
+	// todo: is changing with string is ok?
 	for _, card := range cards {
-		err := sc.AddCard(ctx, card.TraderID, card.Count, card.StockSymbol, card.Dividend)
+		err := sc.AddCard(ctx, card.TraderID, string(card.Count), card.StockSymbol, string(card.Dividend))
 		if err != nil {
 			return fmt.Errorf("failed to init Cards %s", err.Error())
 		}
@@ -74,8 +76,9 @@ func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface)
 // change dividend by string? how to array
 // invoke just accept strings
 // AddCard calls putState of chaincode to add card maybe create a string to push in worldstate
-func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, traderID string, count int, stocksymbol string, dividend int) error {
-
+func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, traderID string, countString string, stocksymbol string, dividendString string) error {
+	count, _ := strconv.Atoi(countString)
+	dividend, _ := strconv.Atoi(dividendString)
 	indexName := "trader~stocksymbol"
 	card := Card{TraderID: traderID, Count: count, StockSymbol: stocksymbol, Dividend: dividend, DividendPayments: make([]DividendPayment, 0)}
 	cardAsByte, _ := json.Marshal(card)
@@ -144,8 +147,11 @@ func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextIn
 
 }
 
-func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, seller string, buyer string, count int, stockSymbol string) error {
+// not changed
+
+func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, seller string, buyer string, countString string, stockSymbol string) error {
 	indexName := "trader~stocksymbol"
+	count, _ := strconv.Atoi(countString)
 	sellerCardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{seller, stockSymbol})
 	sellerResponse, err := ctx.GetStub().GetState(sellerCardKey)
 	if err != nil {
@@ -157,9 +163,10 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	sellerResponseCard := new(Card)
 	_ = json.Unmarshal(sellerResponse, sellerResponseCard)
 	// add it here cause its refrence and maybe deleted in calling update count
-	dividendPaymentCard := sellerResponseCard.DividendPayments
+	//dividendPaymentCard := sellerResponseCard.DividendPayments
 	// negative the number
-	err = sc.updateCount(ctx, sellerResponseCard, -count)
+
+	err = sc.updateCount(ctx, seller, stockSymbol, string(-count))
 	if err != nil {
 		return fmt.Errorf("can't sell card update count ")
 	}
@@ -170,23 +177,27 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	if err != nil {
 		return fmt.Errorf("failed to get Card from world state %s", err.Error())
 	}
-	buyerResponseCard := new(Card)
-	_ = json.Unmarshal(buyerResponse, buyerResponseCard)
-	// negative the number
-	err = sc.updateCount(ctx, buyerResponseCard, count)
-	if err != nil {
-		return fmt.Errorf("can't buy card update count")
-	}
-	err = sc.addDividendPayment(ctx, buyerResponseCard, dividendPaymentCard)
-	if err != nil {
-		return fmt.Errorf("can't buy card update dpayment")
+	if buyerResponse == nil {
+		// todo if no card for her we should create one and add it then update count
+	} else {
+		buyerResponseCard := new(Card)
+		_ = json.Unmarshal(buyerResponse, buyerResponseCard)
+		// negative the number
+		err = sc.updateCount(ctx, buyer, stockSymbol, string(count))
+		if err != nil {
+			return fmt.Errorf("can't buy card update count")
+		}
+		//err = sc.addDividendPayment(ctx, buyerResponseCard, dividendPaymentCard)
+		//if err != nil {
+		//	return fmt.Errorf("can't buy card update dpayment")
+		//}
 	}
 	return nil
 }
 
-func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface, card *Card, countChange int) error {
+func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, countChangeString string) error {
 	indexName := "trader~stocksymbol"
-	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
+	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{traderID, stockSymbol})
 	response, err := ctx.GetStub().GetState(cardKey)
 	if err != nil {
 		return fmt.Errorf("failed to get Card from world state %s", err.Error())
@@ -196,13 +207,14 @@ func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface
 	}
 	responseCard := new(Card)
 	_ = json.Unmarshal(response, responseCard)
+	countChange, _ := strconv.Atoi(countChangeString)
 	responseCard.Count += countChange
 	if responseCard.Count <= 0 {
 		return fmt.Errorf("can't update count the count will be negative ")
 	}
 	// if not deleted buying another card maybe cause problem
 	if responseCard.Count == 0 {
-		sc.deleteDividendPayment(ctx, responseCard)
+		//sc.deleteDividendPayment(ctx, responseCard)
 	} else {
 		cardAsByte, _ := json.Marshal(responseCard)
 		err = ctx.GetStub().PutState(cardKey, cardAsByte)
