@@ -40,12 +40,6 @@ type DividendPayment struct {
 	//Paid bool `json:"paid"`
 }
 
-// QueryResult structure used for handling result of query
-type QueryResult struct {
-	Key    string `json:"Key"`
-	Record *Card
-}
-
 // InitLedger create all cards with TraderID and Issuer and other attr nil
 func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	// todo: get all trader id and issuer id and make card calls AddCard function
@@ -102,45 +96,43 @@ func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, tr
 //	return nil
 //}
 
-func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterface, traderID string) ([]QueryResult, error) {
+func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterface, traderID string) ([]Card, error) {
 	traderIterator, err := ctx.GetStub().GetStateByPartialCompositeKey("trader~stocksymbol", []string{traderID})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Cards of trader %s", err.Error())
 	}
 	defer traderIterator.Close()
-	cards := []QueryResult{}
+	cards := []Card{}
 	for traderIterator.HasNext() {
 		response, err := traderIterator.Next()
 		if err != nil {
 			return nil, err
 		}
-		card := new(Card)
-		_ = json.Unmarshal(response.Value, card)
-		result := QueryResult{Key: response.Key, Record: card}
-		cards = append(cards, result)
+		card := Card{}
+		_ = json.Unmarshal(response.Value, &card)
+		cards = append(cards, card)
 
 	}
 	return cards, nil
 
 }
 
-func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextInterface, stockSymbol string) ([]QueryResult, error) {
+func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextInterface, stockSymbol string) ([]Card, error) {
 	queryString := fmt.Sprintf("{\"selector\":{\"stockSymbol\":\"%s\"}}", stockSymbol)
 	ssymbolIterator, err := ctx.GetStub().GetQueryResult(queryString)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Cards of stock symbol %s", err.Error())
 	}
 	defer ssymbolIterator.Close()
-	cards := []QueryResult{}
+	cards := []Card{}
 	for ssymbolIterator.HasNext() {
 		response, err := ssymbolIterator.Next()
 		if err != nil {
 			return nil, err
 		}
-		card := new(Card)
-		_ = json.Unmarshal(response.Value, card)
-		result := QueryResult{Key: response.Key, Record: card}
-		cards = append(cards, result)
+		card := Card{}
+		_ = json.Unmarshal(response.Value, &card)
+		cards = append(cards, card)
 
 	}
 	return cards, nil
@@ -160,8 +152,9 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	if sellerResponse == nil {
 		return fmt.Errorf("not such a card in worldstate")
 	}
-	sellerResponseCard := new(Card)
-	_ = json.Unmarshal(sellerResponse, sellerResponseCard)
+	fmt.Printf("seller card %s", sellerResponse)
+	sellerResponseCard := Card{}
+	_ = json.Unmarshal(sellerResponse, &sellerResponseCard)
 	// add it here cause its refrence and maybe deleted in calling update count
 	//dividendPaymentCard := sellerResponseCard.DividendPayments
 	// negative the number
@@ -174,14 +167,19 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	// but maybe again she buy it again so clear it up? if zero?
 	buyerCardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{buyer, stockSymbol})
 	buyerResponse, err := ctx.GetStub().GetState(buyerCardKey)
+	fmt.Printf("buyer card %s", buyerResponse)
+
 	if err != nil {
 		return fmt.Errorf("failed to get Card from world state %s", err.Error())
 	}
 	if buyerResponse == nil {
 		// todo if no card for her we should create one and add it then update count
+		fmt.Printf("buyer in nil card %s", buyerResponse)
+
 	} else {
-		buyerResponseCard := new(Card)
-		_ = json.Unmarshal(buyerResponse, buyerResponseCard)
+		fmt.Print("in else")
+		buyerResponseCard := Card{}
+		_ = json.Unmarshal(buyerResponse, &buyerResponseCard)
 		// negative the number
 		err = sc.updateCount(ctx, buyer, stockSymbol, string(count))
 		if err != nil {
@@ -196,6 +194,7 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 }
 
 func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, countChangeString string) error {
+	fmt.Printf("call updateCount %s", countChangeString)
 	indexName := "trader~stocksymbol"
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{traderID, stockSymbol})
 	response, err := ctx.GetStub().GetState(cardKey)
@@ -205,10 +204,10 @@ func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface
 	if response == nil {
 		return fmt.Errorf("not such a card in worldstate")
 	}
-	responseCard := new(Card)
-	_ = json.Unmarshal(response, responseCard)
+	responseCard := Card{}
+	_ = json.Unmarshal(response, &responseCard)
 	countChange, _ := strconv.Atoi(countChangeString)
-	responseCard.Count += countChange
+	responseCard.Count = responseCard.Count + countChange
 	if responseCard.Count <= 0 {
 		return fmt.Errorf("can't update count the count will be negative ")
 	}
@@ -216,6 +215,7 @@ func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface
 	if responseCard.Count == 0 {
 		//sc.deleteDividendPayment(ctx, responseCard)
 	} else {
+		fmt.Printf("can change count")
 		cardAsByte, _ := json.Marshal(responseCard)
 		err = ctx.GetStub().PutState(cardKey, cardAsByte)
 		if err != nil {
@@ -235,8 +235,8 @@ func (sc *StockContract) addDividendPayment(ctx contractapi.TransactionContextIn
 	if response == nil {
 		return fmt.Errorf("not such a card in worldstate")
 	}
-	responseCard := new(Card)
-	_ = json.Unmarshal(response, responseCard)
+	responseCard := Card{}
+	_ = json.Unmarshal(response, &responseCard)
 	for _, dPayment := range dPayments {
 		responseCard.DividendPayments = append(responseCard.DividendPayments, dPayment)
 	}
@@ -258,8 +258,8 @@ func (sc *StockContract) deleteDividendPayment(ctx contractapi.TransactionContex
 	if response == nil {
 		return fmt.Errorf("not such a card in worldstate")
 	}
-	responseCard := new(Card)
-	_ = json.Unmarshal(response, responseCard)
+	responseCard := Card{}
+	_ = json.Unmarshal(response, &responseCard)
 	responseCard.DividendPayments = make([]DividendPayment, 0)
 	cardAsByte, _ := json.Marshal(responseCard)
 	err = ctx.GetStub().PutState(cardKey, cardAsByte)
