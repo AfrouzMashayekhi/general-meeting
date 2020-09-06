@@ -43,7 +43,7 @@ type DividendPayment struct {
 // InitLedger create all cards with TraderID and Issuer and other attr nil
 func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	// todo: get all trader id and issuer id and make card calls AddCard function
-	// todo: for now just add some static issuer trader
+	// for now just add some static issuer trader
 	cards := []Card{
 		{TraderID: "1", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
 		{TraderID: "1", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
@@ -55,7 +55,7 @@ func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface)
 		{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
 		{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
 	}
-	// todo: is changing with string is ok?
+	// todo : is string call ok ?
 	for _, card := range cards {
 		err := sc.AddCard(ctx, card.TraderID, string(card.Count), card.StockSymbol, string(card.Dividend))
 		if err != nil {
@@ -67,8 +67,7 @@ func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface)
 }
 
 //todo: new trader register for adding cards, new issuer register, for dividend update it?
-// change dividend by string? how to array
-// invoke just accept strings
+
 // AddCard calls putState of chaincode to add card maybe create a string to push in worldstate
 func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, traderID string, countString string, stocksymbol string, dividendString string) error {
 	count, _ := strconv.Atoi(countString)
@@ -85,17 +84,7 @@ func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, tr
 	return nil
 }
 
-// not needed if we zero things
-//func (sc *StockContract) DeleteCard(ctx contractapi.TransactionContextInterface, card Card) error {
-//	indexName := "trader~stocksymbol"
-//	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
-//	err := ctx.GetStub().DelState(cardKey)
-//	if err != nil {
-//		return fmt.Errorf("failed to delete Card from world state %s", err.Error())
-//	}
-//	return nil
-//}
-
+// QueryByTrader get all cards assigned to traderID input
 func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterface, traderID string) ([]Card, error) {
 	traderIterator, err := ctx.GetStub().GetStateByPartialCompositeKey("trader~stocksymbol", []string{traderID})
 	if err != nil {
@@ -117,6 +106,7 @@ func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterfa
 
 }
 
+// QueryByStockSymbol get all cards assigned to stock symbol input
 func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextInterface, stockSymbol string) ([]Card, error) {
 	queryString := fmt.Sprintf("{\"selector\":{\"stockSymbol\":\"%s\"}}", stockSymbol)
 	ssymbolIterator, err := ctx.GetStub().GetQueryResult(queryString)
@@ -139,8 +129,7 @@ func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextIn
 
 }
 
-// not changed
-
+// Trade exchange traded count of a stock symbol from seller to a buyer
 func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, seller string, buyer string, countString string, stockSymbol string) error {
 	indexName := "trader~stocksymbol"
 	count, _ := strconv.Atoi(countString)
@@ -152,57 +141,47 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	if sellerResponse == nil {
 		return fmt.Errorf("not such a card in worldstate")
 	}
-	fmt.Printf("seller card %s", sellerResponse)
+	fmt.Printf("seller card\n %s \n", sellerResponse)
 	sellerResponseCard := Card{}
 	_ = json.Unmarshal(sellerResponse, &sellerResponseCard)
 	// add it here cause its refrence and maybe deleted in calling update count
 	//dividendPaymentCard := sellerResponseCard.DividendPayments
-	// negative the number
-
-	//err = sc.updateCount(ctx, seller, stockSymbol, string(-count))
 	sellerResponseCard.Count -= count
 	if sellerResponseCard.Count <= 0 {
 		return fmt.Errorf("can't update count the count will be negative ")
 	}
 	// if not deleted buying another card maybe cause problem
 	if sellerResponseCard.Count == 0 {
-		//sc.deleteDividendPayment(ctx, responseCard)
+		// todo: delete dividend
 	} else {
-		fmt.Printf("can change count")
+		fmt.Printf("Can Trader from seller \n")
 		cardAsByte, _ := json.Marshal(sellerResponseCard)
 		err = ctx.GetStub().PutState(sellerCardKey, cardAsByte)
 		if err != nil {
 			return fmt.Errorf("failed to put Card to world state %s", err.Error())
 		}
 	}
-	//todo: if updateCard count  and dividend payment do I need to update dividend payment if zero so not added?
-	// but maybe again she buy it again so clear it up? if zero?
 	buyerCardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{buyer, stockSymbol})
 	buyerResponse, err := ctx.GetStub().GetState(buyerCardKey)
-	fmt.Printf("buyer card %s", buyerResponse)
+	fmt.Printf("buyer card\n %s \n", buyerResponse)
 
 	if err != nil {
 		return fmt.Errorf("failed to get Card from world state %s", err.Error())
 	}
 	if buyerResponse == nil {
-		// todo if no card for her we should create one and add it then update count
-		fmt.Printf("buyer in nil card %s", buyerResponse)
+		// todo if no card for here we should create one and add it then update count
+		fmt.Printf("buyer in nil card %s \n", buyerResponse)
 
 	} else {
-		fmt.Print("in else")
+		fmt.Print("buyer can buy the Card \n")
 		buyerResponseCard := Card{}
 		_ = json.Unmarshal(buyerResponse, &buyerResponseCard)
-		// negative the number
 		buyerResponseCard.Count += count
 		cardAsByte, _ := json.Marshal(buyerResponseCard)
 		err = ctx.GetStub().PutState(buyerCardKey, cardAsByte)
 		if err != nil {
 			return fmt.Errorf("failed to put Card to world state %s", err.Error())
 		}
-		//err = sc.addDividendPayment(ctx, buyerResponseCard, dividendPaymentCard)
-		//if err != nil {
-		//	return fmt.Errorf("can't buy card update dpayment")
-		//}
 	}
 	return nil
 }
