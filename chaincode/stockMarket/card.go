@@ -159,9 +159,21 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	//dividendPaymentCard := sellerResponseCard.DividendPayments
 	// negative the number
 
-	err = sc.updateCount(ctx, seller, stockSymbol, string(-count))
-	if err != nil {
-		return fmt.Errorf("can't sell card update count ")
+	//err = sc.updateCount(ctx, seller, stockSymbol, string(-count))
+	sellerResponseCard.Count -= count
+	if sellerResponseCard.Count <= 0 {
+		return fmt.Errorf("can't update count the count will be negative ")
+	}
+	// if not deleted buying another card maybe cause problem
+	if sellerResponseCard.Count == 0 {
+		//sc.deleteDividendPayment(ctx, responseCard)
+	} else {
+		fmt.Printf("can change count")
+		cardAsByte, _ := json.Marshal(sellerResponseCard)
+		err = ctx.GetStub().PutState(sellerCardKey, cardAsByte)
+		if err != nil {
+			return fmt.Errorf("failed to put Card to world state %s", err.Error())
+		}
 	}
 	//todo: if updateCard count  and dividend payment do I need to update dividend payment if zero so not added?
 	// but maybe again she buy it again so clear it up? if zero?
@@ -181,9 +193,11 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 		buyerResponseCard := Card{}
 		_ = json.Unmarshal(buyerResponse, &buyerResponseCard)
 		// negative the number
-		err = sc.updateCount(ctx, buyer, stockSymbol, string(count))
+		buyerResponseCard.Count += count
+		cardAsByte, _ := json.Marshal(buyerResponseCard)
+		err = ctx.GetStub().PutState(buyerCardKey, cardAsByte)
 		if err != nil {
-			return fmt.Errorf("can't buy card update count")
+			return fmt.Errorf("failed to put Card to world state %s", err.Error())
 		}
 		//err = sc.addDividendPayment(ctx, buyerResponseCard, dividendPaymentCard)
 		//if err != nil {
