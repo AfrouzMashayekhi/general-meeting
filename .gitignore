@@ -13,3 +13,5 @@
 vendor/
 .vscode
 .gradle
+/my-network/organizations/fabric-ca/company/fabric-ca-server-config.yaml
+/my-network/organizations/fabric-ca/trader/fabric-ca-server-config.yaml
