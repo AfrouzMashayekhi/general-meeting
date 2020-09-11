@@ -40,7 +40,7 @@ Note: you need to use proxy for docker hub and git installtion
 
 ```bash
 #your working space should be $GOPATH/src
-curl -sSL https://gist.githubusercontent.com/afrouzMashaykhi/026ab4f4aa825915c2c9d30001da43d6/raw/7b8746e11f8c59cc25580f6776d1da1665068925/prepare.sh | bash -- 2.0.0 1.4.6 0.4.18
+curl -sSL https://gist.githubusercontent.com/afrouzMashaykhi/026ab4f4aa825915c2c9d30001da43d6/raw/7b8746e11f8c59cc25580f6776d1da1665068925/prepare.sh | bash -s -- 2.0.0 1.4.6 0.4.18
 
 ```
 After successfuly installtion you should have list of images that have been installed<br/>
@@ -54,8 +54,8 @@ cp -r $GOPATH/src/fabric-samples/bin  $GOPATH/bin
 ## Setup infrastructure of share organizantion
 
 This project setup a cluster of 3 Organizations with Fabric-ca and an orderer with which stores data in couch db.
- - Share Dealer
- - Customers
+ - Company
+ - Trader
  - Regulator
 
  **Working Directory** `$GOPATH/src/fabric-samples/my-network/` 
@@ -72,5 +72,4 @@ sudo ./remove.sh
 # for more options of your network you can run
 ./network.sh -help
  ```
-
 

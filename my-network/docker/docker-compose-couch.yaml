@@ -24,7 +24,7 @@ services:
     networks:
       - test
 
-  peer0.customer.share.com:
+  peer0.trader.share.com:
     environment:
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0:5984
@@ -78,7 +78,7 @@ services:
     networks:
       - test
 
-  peer0.sharedealer.share.com:
+  peer0.company.share.com:
     environment:
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb2:5984

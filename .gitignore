@@ -11,7 +11,9 @@
 .project
 # omit Go vendor directories
 vendor/
-.vscode
-.gradle
-/my-network/organizations/fabric-ca/company/fabric-ca-server-config.yaml
-/my-network/organizations/fabric-ca/trader/fabric-ca-server-config.yaml
+.idea/
+channel-artifacts/
+ordererOrganizations/
+peerOrganizations/
+system-genesis-block/
+log.txt

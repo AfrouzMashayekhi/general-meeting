@@ -172,11 +172,11 @@ function createOrgs() {
     echo
 
     echo "##########################################################"
-    echo "############ Create Customers Identities ######################"
+    echo "############ Create Trader Identities ######################"
     echo "##########################################################"
 
     set -x
-    cryptogen generate --config=./organizations/cryptogen/crypto-config-customer.yaml --output="organizations"
+    cryptogen generate --config=./organizations/cryptogen/crypto-config-trader.yaml --output="organizations"
     res=$?
     set +x
     if [ $res -ne 0 ]; then
@@ -198,11 +198,11 @@ function createOrgs() {
     fi
 
     echo "##########################################################"
-    echo "############ Create Share Dealer Identities ######################"
+    echo "############ Create Comany Identities ######################"
     echo "##########################################################"
 
     set -x
-    cryptogen generate --config=./organizations/cryptogen/crypto-config-sharedealer.yaml --output="organizations"
+    cryptogen generate --config=./organizations/cryptogen/crypto-config-company.yaml --output="organizations"
     res=$?
     set +x
     if [ $res -ne 0 ]; then
@@ -253,10 +253,10 @@ function createOrgs() {
     sleep 10
 
     echo "##########################################################"
-    echo "############ Create Customer Identities ######################"
+    echo "############ Create Trader Identities ######################"
     echo "##########################################################"
 
-    createCustomer
+    createTrader
 
     echo "##########################################################"
     echo "############ Create Regultor Identities ######################"
@@ -265,10 +265,10 @@ function createOrgs() {
     createRegulator
 
     echo "##########################################################"
-    echo "############ Create ShareDealer Identities ######################"
+    echo "############ Create Company Identities ######################"
     echo "##########################################################"
 
-    createShareDealer
+    createCompany
 
     echo "##########################################################"
     echo "############ Create Orderer Org Identities ###############"
@@ -279,7 +279,7 @@ function createOrgs() {
   fi
 
   echo
-  echo "Generate CCP files for Customer and Regulator and ShareDealer"
+  echo "Generate CCP files for Trader and Regulator and Company"
   ./organizations/ccp-generate.sh
 }
 
@@ -425,9 +425,9 @@ function networkDown() {
     # remove orderer block and other channel configuration transactions and certs
     rm -rf system-genesis-block/*.block organizations/peerOrganizations organizations/ordererOrganizations
     ## remove fabric ca artifacts
-    rm -rf organizations/fabric-ca/customer/msp organizations/fabric-ca/customer/tls-cert.pem organizations/fabric-ca/customer/ca-cert.pem organizations/fabric-ca/customer/IssuerPublicKey organizations/fabric-ca/customer/IssuerRevocationPublicKey organizations/fabric-ca/customer/fabric-ca-server.db
+    rm -rf organizations/fabric-ca/trader/msp organizations/fabric-ca/trader/tls-cert.pem organizations/fabric-ca/trader/ca-cert.pem organizations/fabric-ca/trader/IssuerPublicKey organizations/fabric-ca/trader/IssuerRevocationPublicKey organizations/fabric-ca/trader/fabric-ca-server.db
     rm -rf organizations/fabric-ca/regulator/msp organizations/fabric-ca/regulator/tls-cert.pem organizations/fabric-ca/regulator/ca-cert.pem organizations/fabric-ca/regulator/IssuerPublicKey organizations/fabric-ca/regulator/IssuerRevocationPublicKey organizations/fabric-ca/regulator/fabric-ca-server.db
-    rm -rf organizations/fabric-ca/sharedealer/msp organizations/fabric-ca/sharedealer/tls-cert.pem organizations/fabric-ca/sharedealer/ca-cert.pem organizations/fabric-ca/sharedealer/IssuerPublicKey organizations/fabric-ca/sharedealer/IssuerRevocationPublicKey organizations/fabric-ca/sharedealer/fabric-ca-server.db
+    rm -rf organizations/fabric-ca/company/msp organizations/fabric-ca/company/tls-cert.pem organizations/fabric-ca/company/ca-cert.pem organizations/fabric-ca/company/IssuerPublicKey organizations/fabric-ca/company/IssuerRevocationPublicKey organizations/fabric-ca/company/fabric-ca-server.db
     rm -rf organizations/fabric-ca/ordererOrg/msp organizations/fabric-ca/ordererOrg/tls-cert.pem organizations/fabric-ca/ordererOrg/ca-cert.pem organizations/fabric-ca/ordererOrg/IssuerPublicKey organizations/fabric-ca/ordererOrg/IssuerRevocationPublicKey organizations/fabric-ca/ordererOrg/fabric-ca-server.db
     # remove channel and script artifacts
     rm -rf channel-artifacts log.txt fabcar.tar.gz fabcar

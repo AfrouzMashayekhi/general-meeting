@@ -1,0 +1,22 @@
+/tmp/fabric:$ peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameOverride orderer.share.com --channelID mychannel --name stock --version 2.0 --package-id $CC_PACKAGE_ID --sequence 2 --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem
+2020-09-03 15:18:30.433 +0430 [chaincodeCmd] ClientWait -> INFO 001 txid [f47ea0c3915c7f18c4920e7ccfcccbfd0d39bc2ea41617fc945910a115f5ce5a] committed with status (VALID) at 
+/tmp/fabric:$ peer lifecycle chaincode checkcommitreadiness --channelID mychannel --name stock --version 2.0 --sequence 2 --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem --output json
+{
+        "approvals": {
+                "CompanyMSP": true,
+                "RegulatorMSP": false,
+                "TraderMSP": true
+        }
+}
+/tmp/fabric:$ peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.share.com --channelID mychannel --name stock --version 2.0 --sequence 2 --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem --peerAddresses localhost:7051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/ca.crt --peerAddresses localhost:11051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/ca.crt
+2020-09-03 15:19:07.114 +0430 [chaincodeCmd] ClientWait -> INFO 001 txid [63b502c8ed7dabcca3ca64099fbc7f5161d99721ecee6a0c5e9e34c58d4e6761] committed with status (VALID) at localhost:7051
+2020-09-03 15:19:07.130 +0430 [chaincodeCmd] ClientWait -> INFO 002 txid [63b502c8ed7dabcca3ca64099fbc7f5161d99721ecee6a0c5e9e34c58d4e6761] committed with status (VALID) at localhost:11051
+/tmp/fabric:$ peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.share.com --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem  -C mychannel -n stock --peerAddresses localhost:7051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/ca.crt --peerAddresses localhost:11051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/ca.crt -c '{"function":"initLedger","Args":[]}'
+2020-09-03 15:19:24.753 +0430 [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001 Chaincode invoke successful. result: status:200 
+/tmp/fabric:$ peer chaincode query -C mychannel -n stock  -c '{"Args":["queryByTrader","1"]}'
+[{"Key":"\u0000trader~stocksymbol\u00001\u0000appl\u0000","Record":{"traderID":"1","count":0,"stockSymbol":"appl","dividend":300,"dividendPayment":[]}},{"Key":"\u0000trader~stocksymbol\u00001\u0000goog\u0000","Record":{"traderID":"1","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}},{"Key":"\u0000trader~stocksymbol\u00001\u0000msft\u0000","Record":{"traderID":"1","count":0,"stockSymbol":"msft","dividend":100,"dividendPayment":[]}}]
+
+/tmp/fabric:$ peer chaincode query -C mychannel -n stock  -c '{"Args":["queryByStockSymbol","goog"]}'
+[{"Key":"\u0000trader~stocksymbol\u00001\u0000goog\u0000","Record":{"traderID":"1","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}},{"Key":"\u0000trader~stocksymbol\u00002\u0000goog\u0000","Record":{"traderID":"2","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}},{"Key":"\u0000trader~stocksymbol\u00003\u0000goog\u0000","Record":{"traderID":"3","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}}]
+/tmp/fabric:$ 
+

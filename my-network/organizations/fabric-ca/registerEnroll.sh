@@ -1,107 +1,107 @@
-function createCustomer {
+function createTrader {
 
   echo
 	echo "Enroll the CA admin"
   echo
-	mkdir -p organizations/peerOrganizations/customer.share.com/
+	mkdir -p organizations/peerOrganizations/trader.share.com/
 
-	export FABRIC_CA_CLIENT_HOME=${PWD}/organizations/peerOrganizations/customer.share.com/
+	export FABRIC_CA_CLIENT_HOME=${PWD}/organizations/peerOrganizations/trader.share.com/
 #  rm -rf $FABRIC_CA_CLIENT_HOME/fabric-ca-client-config.yaml
 #  rm -rf $FABRIC_CA_CLIENT_HOME/msp
 
   set -x
-  fabric-ca-client enroll -u https://admin:adminpw@localhost:7054 --caname ca-customer --tls.certfiles ${PWD}/organizations/fabric-ca/customer/tls-cert.pem
+  fabric-ca-client enroll -u https://admin:adminpw@localhost:7054 --caname ca-trader --tls.certfiles ${PWD}/organizations/fabric-ca/trader/tls-cert.pem
   set +x
 
   echo 'NodeOUs:
   Enable: true
   ClientOUIdentifier:
-    Certificate: cacerts/localhost-7054-ca-customer.pem
+    Certificate: cacerts/localhost-7054-ca-trader.pem
     OrganizationalUnitIdentifier: client
   PeerOUIdentifier:
-    Certificate: cacerts/localhost-7054-ca-customer.pem
+    Certificate: cacerts/localhost-7054-ca-trader.pem
     OrganizationalUnitIdentifier: peer
   AdminOUIdentifier:
-    Certificate: cacerts/localhost-7054-ca-customer.pem
+    Certificate: cacerts/localhost-7054-ca-trader.pem
     OrganizationalUnitIdentifier: admin
   OrdererOUIdentifier:
-    Certificate: cacerts/localhost-7054-ca-customer.pem
-    OrganizationalUnitIdentifier: orderer' > ${PWD}/organizations/peerOrganizations/customer.share.com/msp/config.yaml
+    Certificate: cacerts/localhost-7054-ca-trader.pem
+    OrganizationalUnitIdentifier: orderer' > ${PWD}/organizations/peerOrganizations/trader.share.com/msp/config.yaml
 
   echo
 	echo "Register peer0"
   echo
   set -x
-	fabric-ca-client register --caname ca-customer --id.name peer0 --id.secret peer0pw --id.type peer --id.attrs '"hf.Registrar.Roles=peer"' --tls.certfiles ${PWD}/organizations/fabric-ca/customer/tls-cert.pem
+	fabric-ca-client register --caname ca-trader --id.name peer0 --id.secret peer0pw --id.type peer --id.attrs '"hf.Registrar.Roles=peer"' --tls.certfiles ${PWD}/organizations/fabric-ca/trader/tls-cert.pem
   set +x
 
   echo
   echo "Register user"
   echo
   set -x
-  fabric-ca-client register --caname ca-customer --id.name user1 --id.secret user1pw --id.type client --id.attrs '"hf.Registrar.Roles=client"' --tls.certfiles ${PWD}/organizations/fabric-ca/customer/tls-cert.pem
+  fabric-ca-client register --caname ca-trader --id.name user1 --id.secret user1pw --id.type client --id.attrs '"hf.Registrar.Roles=client"' --tls.certfiles ${PWD}/organizations/fabric-ca/trader/tls-cert.pem
   set +x
 
   echo
   echo "Register the org admin"
   echo
   set -x
-  fabric-ca-client register --caname ca-customer --id.name customeradmin --id.secret customeradminpw --id.type admin --id.attrs '"hf.Registrar.Roles=admin"' --tls.certfiles ${PWD}/organizations/fabric-ca/customer/tls-cert.pem
+  fabric-ca-client register --caname ca-trader --id.name traderadmin --id.secret traderadminpw --id.type admin --id.attrs '"hf.Registrar.Roles=admin"' --tls.certfiles ${PWD}/organizations/fabric-ca/trader/tls-cert.pem
   set +x
 
-	mkdir -p organizations/peerOrganizations/customer.share.com/peers
-  mkdir -p organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com
+	mkdir -p organizations/peerOrganizations/trader.share.com/peers
+  mkdir -p organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com
 
   echo
   echo "## Generate the peer0 msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://peer0:peer0pw@localhost:7054 --caname ca-customer -M ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/msp --csr.hosts peer0.customer.share.com --tls.certfiles ${PWD}/organizations/fabric-ca/customer/tls-cert.pem
+	fabric-ca-client enroll -u https://peer0:peer0pw@localhost:7054 --caname ca-trader -M ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/msp --csr.hosts peer0.trader.share.com --tls.certfiles ${PWD}/organizations/fabric-ca/trader/tls-cert.pem
   set +x
 
-  cp ${PWD}/organizations/peerOrganizations/customer.share.com/msp/config.yaml ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/msp/config.yaml
+  cp ${PWD}/organizations/peerOrganizations/trader.share.com/msp/config.yaml ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/msp/config.yaml
 
   echo
   echo "## Generate the peer0-tls certificates"
   echo
   set -x
-  fabric-ca-client enroll -u https://peer0:peer0pw@localhost:7054 --caname ca-customer -M ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/tls --enrollment.profile tls --csr.hosts peer0.customer.share.com --csr.hosts localhost --tls.certfiles ${PWD}/organizations/fabric-ca/customer/tls-cert.pem
+  fabric-ca-client enroll -u https://peer0:peer0pw@localhost:7054 --caname ca-trader -M ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls --enrollment.profile tls --csr.hosts peer0.trader.share.com --csr.hosts localhost --tls.certfiles ${PWD}/organizations/fabric-ca/trader/tls-cert.pem
   set +x
 
 
-  cp ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/tls/ca.crt
-  cp ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/tls/signcerts/* ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/tls/server.crt
-  cp ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/tls/keystore/* ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/tls/server.key
+  cp ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/ca.crt
+  cp ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/signcerts/* ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/server.crt
+  cp ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/keystore/* ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/server.key
 
-  mkdir ${PWD}/organizations/peerOrganizations/customer.share.com/msp/tlscacerts
-  cp ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/customer.share.com/msp/tlscacerts/ca.crt
+  mkdir ${PWD}/organizations/peerOrganizations/trader.share.com/msp/tlscacerts
+  cp ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/trader.share.com/msp/tlscacerts/ca.crt
 
-  mkdir ${PWD}/organizations/peerOrganizations/customer.share.com/tlsca
-  cp ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/customer.share.com/tlsca/tlsca.customer.share.com-cert.pem
+  mkdir ${PWD}/organizations/peerOrganizations/trader.share.com/tlsca
+  cp ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/trader.share.com/tlsca/tlsca.trader.share.com-cert.pem
 
-  mkdir ${PWD}/organizations/peerOrganizations/customer.share.com/ca
-  cp ${PWD}/organizations/peerOrganizations/customer.share.com/peers/peer0.customer.share.com/msp/cacerts/* ${PWD}/organizations/peerOrganizations/customer.share.com/ca/ca.customer.share.com-cert.pem
+  mkdir ${PWD}/organizations/peerOrganizations/trader.share.com/ca
+  cp ${PWD}/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/msp/cacerts/* ${PWD}/organizations/peerOrganizations/trader.share.com/ca/ca.trader.share.com-cert.pem
 
-  mkdir -p organizations/peerOrganizations/customer.share.com/users
-  mkdir -p organizations/peerOrganizations/customer.share.com/users/User1@customer.share.com
+  mkdir -p organizations/peerOrganizations/trader.share.com/users
+  mkdir -p organizations/peerOrganizations/trader.share.com/users/User1@trader.share.com
 
   echo
   echo "## Generate the user msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://user1:user1pw@localhost:7054 --caname ca-customer -M ${PWD}/organizations/peerOrganizations/customer.share.com/users/User1@customer.share.com/msp --tls.certfiles ${PWD}/organizations/fabric-ca/customer/tls-cert.pem
+	fabric-ca-client enroll -u https://user1:user1pw@localhost:7054 --caname ca-trader -M ${PWD}/organizations/peerOrganizations/trader.share.com/users/User1@trader.share.com/msp --tls.certfiles ${PWD}/organizations/fabric-ca/trader/tls-cert.pem
   set +x
 
-  mkdir -p organizations/peerOrganizations/customer.share.com/users/Admin@customer.share.com
+  mkdir -p organizations/peerOrganizations/trader.share.com/users/Admin@trader.share.com
 
   echo
   echo "## Generate the org admin msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://customeradmin:customeradminpw@localhost:7054 --caname ca-customer -M ${PWD}/organizations/peerOrganizations/customer.share.com/users/Admin@customer.share.com/msp --tls.certfiles ${PWD}/organizations/fabric-ca/customer/tls-cert.pem
+	fabric-ca-client enroll -u https://traderadmin:traderadminpw@localhost:7054 --caname ca-trader -M ${PWD}/organizations/peerOrganizations/trader.share.com/users/Admin@trader.share.com/msp --tls.certfiles ${PWD}/organizations/fabric-ca/trader/tls-cert.pem
   set +x
 
-  cp ${PWD}/organizations/peerOrganizations/customer.share.com/msp/config.yaml ${PWD}/organizations/peerOrganizations/customer.share.com/users/Admin@customer.share.com/msp/config.yaml
+  cp ${PWD}/organizations/peerOrganizations/trader.share.com/msp/config.yaml ${PWD}/organizations/peerOrganizations/trader.share.com/users/Admin@trader.share.com/msp/config.yaml
 
 }
 
@@ -214,110 +214,110 @@ function createRegulator {
 }
 
 
-function createShareDealer {
+function createCompany {
 
   echo
 	echo "Enroll the CA admin"
   echo
-	mkdir -p organizations/peerOrganizations/sharedealer.share.com/
+	mkdir -p organizations/peerOrganizations/company.share.com/
 
-	export FABRIC_CA_CLIENT_HOME=${PWD}/organizations/peerOrganizations/sharedealer.share.com/
+	export FABRIC_CA_CLIENT_HOME=${PWD}/organizations/peerOrganizations/company.share.com/
 #  rm -rf $FABRIC_CA_CLIENT_HOME/fabric-ca-client-config.yaml
 #  rm -rf $FABRIC_CA_CLIENT_HOME/msp
 
   set -x
-  fabric-ca-client enroll -u https://admin:adminpw@localhost:10054 --caname ca-sharedealer --tls.certfiles ${PWD}/organizations/fabric-ca/sharedealer/tls-cert.pem
+  fabric-ca-client enroll -u https://admin:adminpw@localhost:10054 --caname ca-company --tls.certfiles ${PWD}/organizations/fabric-ca/company/tls-cert.pem
   set +x
 
   echo 'NodeOUs:
   Enable: true
   ClientOUIdentifier:
-    Certificate: cacerts/localhost-10054-ca-sharedealer.pem
+    Certificate: cacerts/localhost-10054-ca-company.pem
     OrganizationalUnitIdentifier: client
   PeerOUIdentifier:
-    Certificate: cacerts/localhost-10054-ca-sharedealer.pem
+    Certificate: cacerts/localhost-10054-ca-company.pem
     OrganizationalUnitIdentifier: peer
   AdminOUIdentifier:
-    Certificate: cacerts/localhost-10054-ca-sharedealer.pem
+    Certificate: cacerts/localhost-10054-ca-company.pem
     OrganizationalUnitIdentifier: admin
   OrdererOUIdentifier:
-    Certificate: cacerts/localhost-10054-ca-sharedealer.pem
-    OrganizationalUnitIdentifier: orderer' > ${PWD}/organizations/peerOrganizations/sharedealer.share.com/msp/config.yaml
+    Certificate: cacerts/localhost-10054-ca-company.pem
+    OrganizationalUnitIdentifier: orderer' > ${PWD}/organizations/peerOrganizations/company.share.com/msp/config.yaml
 
   echo
 	echo "Register peer0"
   echo
   set -x
-	fabric-ca-client register --caname ca-sharedealer --id.name peer0 --id.secret peer0pw --id.type peer --id.attrs '"hf.Registrar.Roles=peer"' --tls.certfiles ${PWD}/organizations/fabric-ca/sharedealer/tls-cert.pem
+	fabric-ca-client register --caname ca-company --id.name peer0 --id.secret peer0pw --id.type peer --id.attrs '"hf.Registrar.Roles=peer"' --tls.certfiles ${PWD}/organizations/fabric-ca/company/tls-cert.pem
   set +x
 
   echo
   echo "Register user"
   echo
   set -x
-  fabric-ca-client register --caname ca-sharedealer --id.name user1 --id.secret user1pw --id.type client --id.attrs '"hf.Registrar.Roles=client"' --tls.certfiles ${PWD}/organizations/fabric-ca/sharedealer/tls-cert.pem
+  fabric-ca-client register --caname ca-company --id.name user1 --id.secret user1pw --id.type client --id.attrs '"hf.Registrar.Roles=client"' --tls.certfiles ${PWD}/organizations/fabric-ca/company/tls-cert.pem
   set +x
 
   echo
   echo "Register the org admin"
   echo
   set -x
-  fabric-ca-client register --caname ca-sharedealer --id.name sharedealeradmin --id.secret sharedealeradminpw --id.type admin --id.attrs '"hf.Registrar.Roles=admin"' --tls.certfiles ${PWD}/organizations/fabric-ca/sharedealer/tls-cert.pem
+  fabric-ca-client register --caname ca-company --id.name companyadmin --id.secret companyadminpw --id.type admin --id.attrs '"hf.Registrar.Roles=admin"' --tls.certfiles ${PWD}/organizations/fabric-ca/company/tls-cert.pem
   set +x
 
-	mkdir -p organizations/peerOrganizations/sharedealer.share.com/peers
-  mkdir -p organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com
+	mkdir -p organizations/peerOrganizations/company.share.com/peers
+  mkdir -p organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com
 
   echo
   echo "## Generate the peer0 msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://peer0:peer0pw@localhost:10054 --caname ca-sharedealer -M ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/msp --csr.hosts peer0.sharedealer.share.com --tls.certfiles ${PWD}/organizations/fabric-ca/sharedealer/tls-cert.pem
+	fabric-ca-client enroll -u https://peer0:peer0pw@localhost:10054 --caname ca-company -M ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/msp --csr.hosts peer0.company.share.com --tls.certfiles ${PWD}/organizations/fabric-ca/company/tls-cert.pem
   set +x
 
-  cp ${PWD}/organizations/peerOrganizations/sharedealer.share.com/msp/config.yaml ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/msp/config.yaml
+  cp ${PWD}/organizations/peerOrganizations/company.share.com/msp/config.yaml ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/msp/config.yaml
 
   echo
   echo "## Generate the peer0-tls certificates"
   echo
   set -x
-  fabric-ca-client enroll -u https://peer0:peer0pw@localhost:10054 --caname ca-sharedealer -M ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/tls --enrollment.profile tls --csr.hosts peer0.sharedealer.share.com --csr.hosts localhost --tls.certfiles ${PWD}/organizations/fabric-ca/sharedealer/tls-cert.pem
+  fabric-ca-client enroll -u https://peer0:peer0pw@localhost:10054 --caname ca-company -M ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls --enrollment.profile tls --csr.hosts peer0.company.share.com --csr.hosts localhost --tls.certfiles ${PWD}/organizations/fabric-ca/company/tls-cert.pem
   set +x
 
 
-  cp ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/tls/ca.crt
-  cp ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/tls/signcerts/* ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/tls/server.crt
-  cp ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/tls/keystore/* ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/tls/server.key
+  cp ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/ca.crt
+  cp ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/signcerts/* ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/server.crt
+  cp ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/keystore/* ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/server.key
 
-  mkdir ${PWD}/organizations/peerOrganizations/sharedealer.share.com/msp/tlscacerts
-  cp ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/sharedealer.share.com/msp/tlscacerts/ca.crt
+  mkdir ${PWD}/organizations/peerOrganizations/company.share.com/msp/tlscacerts
+  cp ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/company.share.com/msp/tlscacerts/ca.crt
 
-  mkdir ${PWD}/organizations/peerOrganizations/sharedealer.share.com/tlsca
-  cp ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/sharedealer.share.com/tlsca/tlsca.sharedealer.share.com-cert.pem
+  mkdir ${PWD}/organizations/peerOrganizations/company.share.com/tlsca
+  cp ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/company.share.com/tlsca/tlsca.company.share.com-cert.pem
 
-  mkdir ${PWD}/organizations/peerOrganizations/sharedealer.share.com/ca
-  cp ${PWD}/organizations/peerOrganizations/sharedealer.share.com/peers/peer0.sharedealer.share.com/msp/cacerts/* ${PWD}/organizations/peerOrganizations/sharedealer.share.com/ca/ca.sharedealer.share.com-cert.pem
+  mkdir ${PWD}/organizations/peerOrganizations/company.share.com/ca
+  cp ${PWD}/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/msp/cacerts/* ${PWD}/organizations/peerOrganizations/company.share.com/ca/ca.company.share.com-cert.pem
 
-  mkdir -p organizations/peerOrganizations/sharedealer.share.com/users
-  mkdir -p organizations/peerOrganizations/sharedealer.share.com/users/User1@sharedealer.share.com
+  mkdir -p organizations/peerOrganizations/company.share.com/users
+  mkdir -p organizations/peerOrganizations/company.share.com/users/User1@company.share.com
 
   echo
   echo "## Generate the user msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://user1:user1pw@localhost:10054 --caname ca-sharedealer -M ${PWD}/organizations/peerOrganizations/sharedealer.share.com/users/User1@sharedealer.share.com/msp --tls.certfiles ${PWD}/organizations/fabric-ca/sharedealer/tls-cert.pem
+	fabric-ca-client enroll -u https://user1:user1pw@localhost:10054 --caname ca-company -M ${PWD}/organizations/peerOrganizations/company.share.com/users/User1@company.share.com/msp --tls.certfiles ${PWD}/organizations/fabric-ca/company/tls-cert.pem
   set +x
 
-  mkdir -p organizations/peerOrganizations/sharedealer.share.com/users/Admin@sharedealer.share.com
+  mkdir -p organizations/peerOrganizations/company.share.com/users/Admin@company.share.com
 
   echo
   echo "## Generate the org admin msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://sharedealeradmin:sharedealeradminpw@localhost:10054 --caname ca-sharedealer -M ${PWD}/organizations/peerOrganizations/sharedealer.share.com/users/Admin@sharedealer.share.com/msp --tls.certfiles ${PWD}/organizations/fabric-ca/sharedealer/tls-cert.pem
+	fabric-ca-client enroll -u https://companyadmin:companyadminpw@localhost:10054 --caname ca-company -M ${PWD}/organizations/peerOrganizations/company.share.com/users/Admin@company.share.com/msp --tls.certfiles ${PWD}/organizations/fabric-ca/company/tls-cert.pem
   set +x
 
-  cp ${PWD}/organizations/peerOrganizations/sharedealer.share.com/msp/config.yaml ${PWD}/organizations/peerOrganizations/sharedealer.share.com/users/Admin@sharedealer.share.com/msp/config.yaml
+  cp ${PWD}/organizations/peerOrganizations/company.share.com/msp/config.yaml ${PWD}/organizations/peerOrganizations/company.share.com/users/Admin@company.share.com/msp/config.yaml
 
 }
 function createOrderer {
