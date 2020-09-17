@@ -1,4 +1,4 @@
-package sdk
+package generalMeetingSDK
 
 import (
 	"time"

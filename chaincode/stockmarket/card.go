@@ -1,4 +1,4 @@
-package main
+package stockmarket
 
 import (
 	"encoding/json"
