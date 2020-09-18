@@ -1,5 +1,23 @@
 package stockmarket
 
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 import (
 	"encoding/json"
 	"fmt"
@@ -24,8 +42,6 @@ type Card struct {
 	StockSymbol string `json:"stockSymbol"`
 	// Dividend toman/share
 	Dividend int `json:"dividend"`
-	// mno need for state
-	//State           bool              `json:"state"`
 	// DividendPayments the plan of paying dividend
 	DividendPayments []DividendPayment `json:"dividendPayment"`
 }
@@ -42,26 +58,23 @@ type DividendPayment struct {
 
 // InitLedger create all cards with TraderID and Issuer and other attr nil
 func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
-	// todo: get all trader id and issuer id and make card calls AddCard function
-	// for now just add some static issuer trader
-	cards := []Card{
-		{TraderID: "1", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-		{TraderID: "1", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
-		{TraderID: "1", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-		{TraderID: "2", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-		{TraderID: "2", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-		{TraderID: "2", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
-		{TraderID: "3", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-		{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-		{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
-	}
-	// todo : is string call ok ?
-	for _, card := range cards {
-		err := sc.AddCard(ctx, card.TraderID, string(card.Count), card.StockSymbol, string(card.Dividend))
-		if err != nil {
-			return fmt.Errorf("failed to init Cards %s", err.Error())
-		}
-	}
+	//cards := []Card{
+	//	{TraderID: "1", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
+	//	{TraderID: "1", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
+	//	{TraderID: "1", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
+	//	{TraderID: "2", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
+	//	{TraderID: "2", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
+	//	{TraderID: "2", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
+	//	{TraderID: "3", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
+	//	{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
+	//	{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
+	//}
+	//for _, card := range cards {
+	//	err := sc.AddCard(ctx, card.TraderID, string(card.Count), card.StockSymbol, string(card.Dividend))
+	//	if err != nil {
+	//		return fmt.Errorf("failed to init Cards %s", err.Error())
+	//	}
+	//}
 	return nil
 
 }
@@ -75,7 +88,6 @@ func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, tr
 	indexName := "trader~stocksymbol"
 	card := Card{TraderID: traderID, Count: count, StockSymbol: stocksymbol, Dividend: dividend, DividendPayments: make([]DividendPayment, 0)}
 	cardAsByte, _ := json.Marshal(card)
-	// todo: validate by issuer is handeled here?
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
 	err := ctx.GetStub().PutState(cardKey, cardAsByte)
 	if err != nil {
@@ -169,7 +181,6 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 		return fmt.Errorf("failed to get Card from world state %s", err.Error())
 	}
 	if buyerResponse == nil {
-		// todo if no card for here we should create one and add it then update count
 		fmt.Printf("buyer in nil card %s \n", buyerResponse)
 
 	} else {
