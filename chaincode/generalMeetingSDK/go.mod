@@ -11,7 +11,10 @@ require (
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20200728190242-9b3ae92d8664 // indirect
 	github.com/hyperledger/fabric-protos-go v0.0.0-20200917184523-71c4060efc42 // indirect
+	github.com/hyperledger/fabric-sdk-go v1.0.0-beta3
+	github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric v0.0.0-20190822125948-d2b42602e52e
 	github.com/mailru/easyjson v0.7.6 // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/rogpeppe/go-internal v1.6.2 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
