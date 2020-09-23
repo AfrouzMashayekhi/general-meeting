@@ -197,7 +197,7 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	return nil
 }
 
-func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, countChangeString string) error {
+func (sc *StockContract) UpdateCount(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, countChangeString string) error {
 	fmt.Printf("call updateCount %s", countChangeString)
 	indexName := "trader~stocksymbol"
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{traderID, stockSymbol})
@@ -225,6 +225,29 @@ func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface
 		if err != nil {
 			return fmt.Errorf("failed to put Card to world state %s", err.Error())
 		}
+	}
+	return nil
+}
+
+// UpdateDividend Update given trader and stocksymbol update dividend field
+func (sc *StockContract) UpdateDividend(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, dividendString string) error {
+	indexName := "trader~stocksymbol"
+	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{traderID, stockSymbol})
+	response, err := ctx.GetStub().GetState(cardKey)
+	if err != nil {
+		return fmt.Errorf("failed to get Card from world state %s", err.Error())
+	}
+	if response == nil {
+		return fmt.Errorf("not such a card in worldstate")
+	}
+	responseCard := Card{}
+	_ = json.Unmarshal(response, &responseCard)
+	dividend, _ := strconv.Atoi(dividendString)
+	responseCard.Dividend = dividend
+	cardAsByte, _ := json.Marshal(responseCard)
+	err = ctx.GetStub().PutState(cardKey, cardAsByte)
+	if err != nil {
+		return fmt.Errorf("failed to put Card to world state %s", err.Error())
 	}
 	return nil
 }
