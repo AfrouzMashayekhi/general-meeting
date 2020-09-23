@@ -2,6 +2,7 @@
 pwd fabric/fabric-samples
 cp config/coreTrader.yaml /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/core.yaml
 cp config/coreCompany.yaml /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/company.share.com/core.yaml
+cp config/coreRegulator.yaml /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/regulator.share.com/core.yaml
 export FABRIC_CFG_PATH=/home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/
 mkdir /tmp/fabric
 cd /tmp/fabric/
@@ -36,12 +37,12 @@ peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameO
 
 peer lifecycle chaincode checkcommitreadiness --channelID mychannel --name stock --version 1.0 --sequence 1 --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem --output json
 
-peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.share.com --channelID mychannel --name stock --version 1.0 --sequence 1 --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem --peerAddresses localhost:7051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/ca.crt --peerAddresses localhost:11051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/ca.crt
+peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.share.com --channelID mychannel --name stock --version 1.0 --sequence 1 --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem --peerAddresses localhost:7051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/ca.crt  --peerAddresses localhost:9051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/regulator.share.com/peers/peer0.regulator.share.com/tls/ca.crt --peerAddresses localhost:11051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/ca.crt
 
 
 peer lifecycle chaincode querycommitted --channelID mychannel --name stock --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem 
 
-peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.share.com --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem  -C mychannel -n stock --peerAddresses localhost:7051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/ca.crt --peerAddresses localhost:11051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/ca.crt -c '{"function":"initLedger","Args":[]}'
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.share.com --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem  -C mychannel -n stock --peerAddresses localhost:7051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/ca.crt --peerAddresses localhost:9051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/regulator.share.com/peers/peer0.regulator.share.com/tls/ca.crt --peerAddresses localhost:11051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/ca.crt -c '{"function":"initLedger","Args":[]}'
 
 peer chaincode query -C mychannel -n stock  -c '{"Args":["queryByTrader","1"]}'
 
@@ -56,3 +57,13 @@ peer chaincode query -C mychannel -n stock  -c '{"Args":["queryByStockSymbol","g
 peer chaincode query -C mychannel -n stock  -c '{"Args":["queryByTrader","1"]}'
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.share.com --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem  -C mychannel -n stock --peerAddresses localhost:7051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/ca.crt --peerAddresses localhost:11051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/ca.crt -c '{"function":"addCard","Args":["1","300","amzn","800"]}'
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.share.com --tls --cafile /home/afrouz/go/src/fabric-samples/my-network/organizations/ordererOrganizations/share.com/orderers/orderer.share.com/msp/tlscacerts/tlsca.share.com-cert.pem  -C mychannel -n stock --peerAddresses localhost:7051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/peers/peer0.trader.share.com/tls/ca.crt --peerAddresses localhost:11051 --tlsRootCertFiles /home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/company.share.com/peers/peer0.company.share.com/tls/ca.crt -c '{"function":"trade","Args":["1","2","200","amzn"}'
+
+
+
+###
+regulator config
+export FABRIC_CFG_PATH=/home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/regulator.share.com/
+export CORE_PEER_LOCALMSPID="RegulatorMSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=/home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/regulator.share.com/peers/peer0.regulator.share.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=/home/afrouz/go/src/fabric-samples/my-network/organizations/peerOrganizations/regulator.share.com/users/Admin@regulator.share.com/msp/
+export CORE_PEER_ADDRESS=localhost:9051
