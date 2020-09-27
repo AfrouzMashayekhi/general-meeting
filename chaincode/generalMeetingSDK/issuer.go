@@ -1,6 +1,10 @@
 package generalMeetingSDK
 
-import sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
+import (
+	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
+)
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,10 +32,11 @@ type Issuer struct {
 }
 
 // RegisterIssuer is called for new company to join stock market
-func RegisterIssuer(companyName string, stockSymbol string) *Issuer {
-	// todo:should we enroll new user for company
+func RegisterIssuer(sdk *fabsdk.FabricSDK, client *channel.Client) *Issuer {
+	// todo: read input for stocksymbol and company name
 	// todo: add cards to worldstate for every trader in market
-	return &Issuer{CompanyName: companyName, StockSymbol: stockSymbol}
+
+	return nil
 }
 
 // ValidateCard Func Validates traders cards if they own this company share or not
@@ -40,8 +45,15 @@ func (i *Issuer) ValidateCard(card sm.Card) bool {
 	return true
 }
 
+// AddCards func add cards for trader of issuer validate it return true
+func (i *Issuer) AddCards(client *channel.Client, cards []sm.Card) bool {
+	//todo: call validateCard
+	//todo: if validated call transaction add card
+	return true
+}
+
 // GeneralMeeting Func took place and add card to shareholders for dividend
-func (i *Issuer) GeneralMeeting() error {
+func (i *Issuer) GeneralMeeting(client *channel.Client) error {
 	// todo: execute QueryByStockSymbol create a list and loop and update dividend and dividendPayment
 	return nil
 }
