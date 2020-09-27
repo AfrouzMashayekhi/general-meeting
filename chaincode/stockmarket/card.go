@@ -58,23 +58,18 @@ type DividendPayment struct {
 
 // InitLedger create all cards with TraderID and Issuer and other attr nil
 func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
-	//cards := []Card{
-	//	{TraderID: "1", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-	//	{TraderID: "1", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
-	//	{TraderID: "1", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-	//	{TraderID: "2", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-	//	{TraderID: "2", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-	//	{TraderID: "2", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
-	//	{TraderID: "3", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-	//	{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-	//	{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
-	//}
-	//for _, card := range cards {
-	//	err := sc.AddCard(ctx, card.TraderID, string(card.Count), card.StockSymbol, string(card.Dividend))
-	//	if err != nil {
-	//		return fmt.Errorf("failed to init Cards %s", err.Error())
-	//	}
-	//}
+	// add a reserved card for query and adding issuer and trader
+	card := Card{
+		TraderID:         "afrouz",
+		Count:            0,
+		StockSymbol:      "afrouz",
+		Dividend:         0,
+		DividendPayments: nil,
+	}
+	err := sc.AddCard(ctx, card.TraderID, string(card.Count), card.StockSymbol, string(card.Dividend))
+	if err != nil {
+		return fmt.Errorf("failed to init Cards %s", err.Error())
+	}
 	return nil
 
 }

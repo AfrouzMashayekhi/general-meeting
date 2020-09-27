@@ -18,7 +18,11 @@ package generalMeetingSDK
  * specific language governing permissions and limitations
  * under the License.
  */
-import sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
+import (
+	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
+)
 
 // Trader is a shareholder or someone with TraderID who but dividend
 type Trader struct {
@@ -28,16 +32,20 @@ type Trader struct {
 	TraderID string `json:"traderID"`
 }
 
-// TraderRegister func is called when someone want to join the market
-func TraderRegister(traderID string) *Trader {
+// RegisterTrader func is called when someone want to join the market
+func RegisterTrader(sdk *fabsdk.FabricSDK, client *channel.Client) *Trader {
 	//todo: add array of trader with issuer global map? use couchdb select
-	//todo: should we enroll new user?
+	//todo: add trader id
 	// todo: add cards to worldstate for every trader in market
-	return &Trader{TraderID: traderID}
+
+	//trader := Trader{TraderID: traderID}
+	//setup.trader= &trader
+	//return &trader
+	return nil
 }
 
 // AddCards func add cards for trader of issuer validate it return true
-func (t *Trader) AddCards(cards []sm.Card) bool {
+func (t *Trader) AddCards(client *channel.Client, cards []sm.Card) bool {
 	//todo: call validateCard
 	//todo: if validated call transaction add card
 	return true
@@ -45,7 +53,7 @@ func (t *Trader) AddCards(cards []sm.Card) bool {
 
 // Trading trade from seller to buyer the buyCount mount if succeeded return true
 // should it be function or method for seller? no it should be func it calls from outside
-func Trading(seller string, buyer string, buyCount int, stockSymbol string) bool {
+func Trading(client *channel.Client, seller string, buyer string, buyCount int, stockSymbol string) bool {
 	//todo:execute Trade
 	return true
 }
