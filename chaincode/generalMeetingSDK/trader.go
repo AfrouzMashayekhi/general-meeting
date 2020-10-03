@@ -19,6 +19,7 @@ package generalMeetingSDK
  * under the License.
  */
 import (
+	"fmt"
 	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
@@ -32,11 +33,24 @@ type Trader struct {
 	TraderID string `json:"traderID"`
 }
 
+var reservedStockSymbol []byte = []byte("afrouz")
+var reservedTraderID []byte = []byte("afrouz")
+
 // RegisterTrader func is called when someone want to join the market
-func RegisterTrader(sdk *fabsdk.FabricSDK, client *channel.Client) *Trader {
-	//todo: add array of trader with issuer global map? use couchdb select
+func RegisterTrader(ccName string, sdk *fabsdk.FabricSDK, client *channel.Client) *Trader {
 	//todo: add trader id
 	// todo: add cards to worldstate for every trader in market
+
+	response, err := client.Query(channel.Request{
+		ChaincodeID: ccName,
+		Fcn:         "QueryByTrader",
+		Args:        [][]byte{reservedTraderID},
+		IsInit:      false,
+	})
+	if err != nil {
+		fmt.Errorf("couldn't query cards for")
+	}
+	cards := sm.QueryCard{}
 
 	//trader := Trader{TraderID: traderID}
 	//setup.trader= &trader
