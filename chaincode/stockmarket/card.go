@@ -45,6 +45,9 @@ type Card struct {
 	// DividendPayments the plan of paying dividend
 	DividendPayments []DividendPayment `json:"dividendPayment"`
 }
+type QueryCard struct {
+	cards []Card `json:"cards"`
+}
 
 // DividendPayment status of time plan of dividend pays
 type DividendPayment struct {
@@ -92,21 +95,21 @@ func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, tr
 }
 
 // QueryByTrader get all cards assigned to traderID input
-func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterface, traderID string) ([]Card, error) {
+func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterface, traderID string) (QueryCard, error) {
 	traderIterator, err := ctx.GetStub().GetStateByPartialCompositeKey("trader~stocksymbol", []string{traderID})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get Cards of trader %s", err.Error())
+		return QueryCard{}, fmt.Errorf("failed to get Cards of trader %s", err.Error())
 	}
 	defer traderIterator.Close()
-	cards := []Card{}
+	cards := QueryCard{}
 	for traderIterator.HasNext() {
 		response, err := traderIterator.Next()
 		if err != nil {
-			return nil, err
+			return QueryCard{}, err
 		}
 		card := Card{}
 		_ = json.Unmarshal(response.Value, &card)
-		cards = append(cards, card)
+		cards.cards = append(cards.cards, card)
 
 	}
 	return cards, nil
@@ -114,22 +117,22 @@ func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterfa
 }
 
 // QueryByStockSymbol get all cards assigned to stock symbol input
-func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextInterface, stockSymbol string) ([]Card, error) {
+func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextInterface, stockSymbol string) (QueryCard, error) {
 	queryString := fmt.Sprintf("{\"selector\":{\"stockSymbol\":\"%s\"}}", stockSymbol)
 	ssymbolIterator, err := ctx.GetStub().GetQueryResult(queryString)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get Cards of stock symbol %s", err.Error())
+		return QueryCard{}, fmt.Errorf("failed to get Cards of stock symbol %s", err.Error())
 	}
 	defer ssymbolIterator.Close()
-	cards := []Card{}
+	cards := QueryCard{}
 	for ssymbolIterator.HasNext() {
 		response, err := ssymbolIterator.Next()
 		if err != nil {
-			return nil, err
+			return QueryCard{}, err
 		}
 		card := Card{}
 		_ = json.Unmarshal(response.Value, &card)
-		cards = append(cards, card)
+		cards.cards = append(cards.cards, card)
 
 	}
 	return cards, nil
