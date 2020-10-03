@@ -23,7 +23,6 @@ import (
 	"fmt"
 	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 )
 
 // Trader is a shareholder or someone with TraderID who but dividend
@@ -34,14 +33,12 @@ type Trader struct {
 	TraderID string `json:"traderID"`
 }
 
-var reservedStockSymbol []byte = []byte("afrouz")
 var reservedTraderID []byte = []byte("afrouz")
 
 // RegisterTrader func is called when someone want to join the market
-func RegisterTrader(ccName string, sdk *fabsdk.FabricSDK, client *channel.Client) *Trader {
-	//todo: add trader id
-	// todo: add cards to worldstate for every trader in market
+func RegisterTrader(ccName string, client *channel.Client, traderID string) *Trader {
 
+	// add cards to worldstate for every trader in market
 	response, err := client.Query(channel.Request{
 		ChaincodeID: ccName,
 		Fcn:         "QueryByTrader",
@@ -49,25 +46,53 @@ func RegisterTrader(ccName string, sdk *fabsdk.FabricSDK, client *channel.Client
 		IsInit:      false,
 	})
 	if err != nil {
-		fmt.Errorf("couldn't query cards for")
+		fmt.Errorf("couldn't query cards for%s", traderID)
 	}
 	cards := sm.QueryCard{}
 	_ = json.Unmarshal(response.Payload, &cards)
-	for i, i2 := range cards.cards {
+	for _, card := range cards.Cards {
+		invokeArgs := [][]byte{[]byte(traderID), []byte(card.StockSymbol), []byte("0"), []byte("0")}
+		_, err := client.Execute(channel.Request{
+			ChaincodeID: ccName,
+			Fcn:         "AddCard",
+			Args:        invokeArgs,
+		})
+
+		if err != nil {
+			fmt.Errorf("Failed to invoke: %+v\n", err)
+		}
 
 	}
 
-	//trader := Trader{TraderID: traderID}
-	//setup.trader= &trader
-	//return &trader
-	return nil
+	trader := Trader{TraderID: traderID}
+	//todo: do we need returning cards?
+	return &trader
 }
 
 // AddCards func add cards for trader of issuer validate it return true
-func (t *Trader) AddCards(client *channel.Client, cards []sm.Card) bool {
-	//todo: call validateCard
-	//todo: if validated call transaction add card
-	return true
+func (t *Trader) AddCards(ccName string, client *channel.Client, cards []sm.Card) error {
+
+	for _, card := range cards {
+		// todo: it's a distributed app how can I find issuer create new one?
+		issuer := Issuer{
+			StockSymbol: card.StockSymbol,
+		}
+		if issuer.ValidateCard(card) {
+			invokeArgs := [][]byte{[]byte(card.TraderID), []byte(card.StockSymbol), []byte(string(card.Count)), []byte(string(card.Dividend))}
+			_, err := client.Execute(channel.Request{
+				ChaincodeID: ccName,
+				Fcn:         "UpdateFields",
+				Args:        invokeArgs,
+			})
+
+			if err != nil {
+				return fmt.Errorf("Failed to validate and update card: %+v\n", err)
+			}
+		} else {
+			return fmt.Errorf("the Card : %+v is not Validated by issuer", card)
+		}
+	}
+	return nil
 }
 
 // Trading trade from seller to buyer the buyCount mount if succeeded return true

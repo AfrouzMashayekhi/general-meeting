@@ -1,9 +1,10 @@
 package generalMeetingSDK
 
 import (
+	"encoding/json"
+	"fmt"
 	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 )
 
 /*
@@ -24,6 +25,7 @@ import (
  * specific language governing permissions and limitations
  * under the License.
  */
+var reservedStockSymbol []byte = []byte("afrouz")
 
 // Issuer is a company that validate and pays Dividend and holds General Meetings
 type Issuer struct {
@@ -32,23 +34,43 @@ type Issuer struct {
 }
 
 // RegisterIssuer is called for new company to join stock market
-func RegisterIssuer(sdk *fabsdk.FabricSDK, client *channel.Client) *Issuer {
-	// todo: read input for stocksymbol and company name
-	// todo: add cards to worldstate for every trader in market
+func RegisterIssuer(ccName string, client *channel.Client, companyName string, stockSymbol string) *Issuer {
+	// add cards to worldstate for every issuer in market
+	response, err := client.Query(channel.Request{
+		ChaincodeID: ccName,
+		Fcn:         "QueryByStockSymbol",
+		Args:        [][]byte{reservedStockSymbol},
+		IsInit:      false,
+	})
+	if err != nil {
+		fmt.Errorf("couldn't query cards for%s", stockSymbol)
+	}
+	cards := sm.QueryCard{}
+	_ = json.Unmarshal(response.Payload, &cards)
+	for _, card := range cards.Cards {
+		invokeArgs := [][]byte{[]byte(card.TraderID), []byte(stockSymbol), []byte("0"), []byte("0")}
+		_, err := client.Execute(channel.Request{
+			ChaincodeID: ccName,
+			Fcn:         "AddCard",
+			Args:        invokeArgs,
+		})
 
-	return nil
+		if err != nil {
+			fmt.Printf("Failed to invoke: %+v\n", err)
+		}
+
+	}
+
+	issuer := Issuer{
+		CompanyName: companyName,
+		StockSymbol: stockSymbol,
+	}
+	return &issuer
 }
 
 // ValidateCard Func Validates traders cards if they own this company share or not
 func (i *Issuer) ValidateCard(card sm.Card) bool {
 	//todo: do we have a list or anything should ask from Analoui
-	return true
-}
-
-// AddCards func add cards for trader of issuer validate it return true
-func (i *Issuer) AddCards(client *channel.Client, cards []sm.Card) bool {
-	//todo: call validateCard
-	//todo: if validated call transaction add card
 	return true
 }
 
