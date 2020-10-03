@@ -12,7 +12,6 @@ require (
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20200728190242-9b3ae92d8664 // indirect
 	github.com/hyperledger/fabric-contract-api-go v1.1.0
 	github.com/hyperledger/fabric-protos-go v0.0.0-20200923192742-3897341ac036 // indirect
-	github.com/kr/pretty v0.2.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
