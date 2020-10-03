@@ -97,7 +97,16 @@ func (t *Trader) AddCards(ccName string, client *channel.Client, cards []sm.Card
 
 // Trading trade from seller to buyer the buyCount mount if succeeded return true
 // should it be function or method for seller? no it should be func it calls from outside
-func Trading(client *channel.Client, seller string, buyer string, buyCount int, stockSymbol string) bool {
-	//todo:execute Trade
-	return true
+func Trading(ccName string, client *channel.Client, seller string, buyer string, buyCount int, stockSymbol string) error {
+	invokeArgs := [][]byte{[]byte(seller), []byte(buyer), []byte(string(buyCount)), []byte(stockSymbol)}
+	_, err := client.Execute(channel.Request{
+		ChaincodeID: ccName,
+		Fcn:         "Trade",
+		Args:        invokeArgs,
+	})
+
+	if err != nil {
+		return fmt.Errorf("Failed to trade card: %+v\n", err)
+	}
+	return nil
 }
