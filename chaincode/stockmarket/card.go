@@ -46,7 +46,7 @@ type Card struct {
 	DividendPayments []DividendPayment `json:"dividendPayment"`
 }
 type QueryCard struct {
-	cards []Card `json:"cards"`
+	Cards []Card `json:"cards"`
 }
 
 // DividendPayment status of time plan of dividend pays
@@ -109,7 +109,7 @@ func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterfa
 		}
 		card := Card{}
 		_ = json.Unmarshal(response.Value, &card)
-		cards.cards = append(cards.cards, card)
+		cards.Cards = append(cards.Cards, card)
 
 	}
 	return cards, nil
@@ -132,7 +132,7 @@ func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextIn
 		}
 		card := Card{}
 		_ = json.Unmarshal(response.Value, &card)
-		cards.cards = append(cards.cards, card)
+		cards.Cards = append(cards.Cards, card)
 
 	}
 	return cards, nil

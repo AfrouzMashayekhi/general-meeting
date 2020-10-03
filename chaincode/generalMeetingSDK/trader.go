@@ -19,6 +19,7 @@ package generalMeetingSDK
  * under the License.
  */
 import (
+	"encoding/json"
 	"fmt"
 	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
@@ -51,6 +52,10 @@ func RegisterTrader(ccName string, sdk *fabsdk.FabricSDK, client *channel.Client
 		fmt.Errorf("couldn't query cards for")
 	}
 	cards := sm.QueryCard{}
+	_ = json.Unmarshal(response.Payload, &cards)
+	for i, i2 := range cards.cards {
+
+	}
 
 	//trader := Trader{TraderID: traderID}
 	//setup.trader= &trader
