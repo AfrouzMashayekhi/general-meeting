@@ -1,5 +1,23 @@
 package stockmarket
 
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 import (
 	"encoding/json"
 	"fmt"
@@ -24,10 +42,11 @@ type Card struct {
 	StockSymbol string `json:"stockSymbol"`
 	// Dividend toman/share
 	Dividend int `json:"dividend"`
-	// mno need for state
-	//State           bool              `json:"state"`
 	// DividendPayments the plan of paying dividend
 	DividendPayments []DividendPayment `json:"dividendPayment"`
+}
+type QueryCard struct {
+	cards []Card `json:"cards"`
 }
 
 // DividendPayment status of time plan of dividend pays
@@ -42,25 +61,17 @@ type DividendPayment struct {
 
 // InitLedger create all cards with TraderID and Issuer and other attr nil
 func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
-	// todo: get all trader id and issuer id and make card calls AddCard function
-	// for now just add some static issuer trader
-	cards := []Card{
-		{TraderID: "1", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-		{TraderID: "1", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
-		{TraderID: "1", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-		{TraderID: "2", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-		{TraderID: "2", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-		{TraderID: "2", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
-		{TraderID: "3", Count: 0, StockSymbol: "msft", Dividend: 100, DividendPayments: nil},
-		{TraderID: "3", Count: 0, StockSymbol: "goog", Dividend: 200, DividendPayments: nil},
-		{TraderID: "3", Count: 0, StockSymbol: "appl", Dividend: 300, DividendPayments: nil},
+	// add a reserved card for query and adding issuer and trader
+	card := Card{
+		TraderID:         "afrouz",
+		Count:            0,
+		StockSymbol:      "afrouz",
+		Dividend:         0,
+		DividendPayments: nil,
 	}
-	// todo : is string call ok ?
-	for _, card := range cards {
-		err := sc.AddCard(ctx, card.TraderID, string(card.Count), card.StockSymbol, string(card.Dividend))
-		if err != nil {
-			return fmt.Errorf("failed to init Cards %s", err.Error())
-		}
+	err := sc.AddCard(ctx, card.TraderID, string(card.Count), card.StockSymbol, string(card.Dividend))
+	if err != nil {
+		return fmt.Errorf("failed to init Cards %s", err.Error())
 	}
 	return nil
 
@@ -75,7 +86,6 @@ func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, tr
 	indexName := "trader~stocksymbol"
 	card := Card{TraderID: traderID, Count: count, StockSymbol: stocksymbol, Dividend: dividend, DividendPayments: make([]DividendPayment, 0)}
 	cardAsByte, _ := json.Marshal(card)
-	// todo: validate by issuer is handeled here?
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
 	err := ctx.GetStub().PutState(cardKey, cardAsByte)
 	if err != nil {
@@ -85,21 +95,21 @@ func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, tr
 }
 
 // QueryByTrader get all cards assigned to traderID input
-func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterface, traderID string) ([]Card, error) {
+func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterface, traderID string) (QueryCard, error) {
 	traderIterator, err := ctx.GetStub().GetStateByPartialCompositeKey("trader~stocksymbol", []string{traderID})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get Cards of trader %s", err.Error())
+		return QueryCard{}, fmt.Errorf("failed to get Cards of trader %s", err.Error())
 	}
 	defer traderIterator.Close()
-	cards := []Card{}
+	cards := QueryCard{}
 	for traderIterator.HasNext() {
 		response, err := traderIterator.Next()
 		if err != nil {
-			return nil, err
+			return QueryCard{}, err
 		}
 		card := Card{}
 		_ = json.Unmarshal(response.Value, &card)
-		cards = append(cards, card)
+		cards.cards = append(cards.cards, card)
 
 	}
 	return cards, nil
@@ -107,22 +117,22 @@ func (sc *StockContract) QueryByTrader(ctx contractapi.TransactionContextInterfa
 }
 
 // QueryByStockSymbol get all cards assigned to stock symbol input
-func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextInterface, stockSymbol string) ([]Card, error) {
+func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextInterface, stockSymbol string) (QueryCard, error) {
 	queryString := fmt.Sprintf("{\"selector\":{\"stockSymbol\":\"%s\"}}", stockSymbol)
 	ssymbolIterator, err := ctx.GetStub().GetQueryResult(queryString)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get Cards of stock symbol %s", err.Error())
+		return QueryCard{}, fmt.Errorf("failed to get Cards of stock symbol %s", err.Error())
 	}
 	defer ssymbolIterator.Close()
-	cards := []Card{}
+	cards := QueryCard{}
 	for ssymbolIterator.HasNext() {
 		response, err := ssymbolIterator.Next()
 		if err != nil {
-			return nil, err
+			return QueryCard{}, err
 		}
 		card := Card{}
 		_ = json.Unmarshal(response.Value, &card)
-		cards = append(cards, card)
+		cards.cards = append(cards.cards, card)
 
 	}
 	return cards, nil
@@ -169,7 +179,6 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 		return fmt.Errorf("failed to get Card from world state %s", err.Error())
 	}
 	if buyerResponse == nil {
-		// todo if no card for here we should create one and add it then update count
 		fmt.Printf("buyer in nil card %s \n", buyerResponse)
 
 	} else {
@@ -186,7 +195,7 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	return nil
 }
 
-func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, countChangeString string) error {
+func (sc *StockContract) UpdateCount(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, countChangeString string) error {
 	fmt.Printf("call updateCount %s", countChangeString)
 	indexName := "trader~stocksymbol"
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{traderID, stockSymbol})
@@ -214,6 +223,29 @@ func (sc *StockContract) updateCount(ctx contractapi.TransactionContextInterface
 		if err != nil {
 			return fmt.Errorf("failed to put Card to world state %s", err.Error())
 		}
+	}
+	return nil
+}
+
+// UpdateDividend Update given trader and stocksymbol update dividend field
+func (sc *StockContract) UpdateDividend(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, dividendString string) error {
+	indexName := "trader~stocksymbol"
+	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{traderID, stockSymbol})
+	response, err := ctx.GetStub().GetState(cardKey)
+	if err != nil {
+		return fmt.Errorf("failed to get Card from world state %s", err.Error())
+	}
+	if response == nil {
+		return fmt.Errorf("not such a card in worldstate")
+	}
+	responseCard := Card{}
+	_ = json.Unmarshal(response, &responseCard)
+	dividend, _ := strconv.Atoi(dividendString)
+	responseCard.Dividend = dividend
+	cardAsByte, _ := json.Marshal(responseCard)
+	err = ctx.GetStub().PutState(cardKey, cardAsByte)
+	if err != nil {
+		return fmt.Errorf("failed to put Card to world state %s", err.Error())
 	}
 	return nil
 }

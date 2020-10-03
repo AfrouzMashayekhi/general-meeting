@@ -1,4 +1,4 @@
-module  github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket
+module github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket
 
 go 1.14
 
