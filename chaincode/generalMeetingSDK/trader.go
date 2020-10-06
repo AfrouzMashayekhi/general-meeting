@@ -78,7 +78,8 @@ func (t *Trader) AddCards(ccName string, client *channel.Client, cards []sm.Card
 			StockSymbol: card.StockSymbol,
 		}
 		if issuer.ValidateCard(card) {
-			invokeArgs := [][]byte{[]byte(card.TraderID), []byte(card.StockSymbol), []byte(string(card.Count)), []byte(string(card.Dividend))}
+			paymentAsByte, _ := json.Marshal(card.DividendPayments)
+			invokeArgs := [][]byte{[]byte(card.TraderID), []byte(card.StockSymbol), []byte(string(card.Count)), []byte(string(card.Dividend)), paymentAsByte}
 			_, err := client.Execute(channel.Request{
 				ChaincodeID: ccName,
 				Fcn:         "UpdateFields",
