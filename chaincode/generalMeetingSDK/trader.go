@@ -112,3 +112,19 @@ func Trading(ccName string, client *channel.Client, seller string, buyer string,
 	}
 	return nil
 }
+
+// GetCards return all cards of trader
+func (t *Trader) GetCards(ccName string, client *channel.Client) (sm.QueryCard, error) {
+	response, err := client.Query(channel.Request{
+		ChaincodeID: ccName,
+		Fcn:         "QueryByTraderID",
+		Args:        [][]byte{[]byte(t.TraderID)},
+		IsInit:      false,
+	})
+	if err != nil {
+		return sm.QueryCard{}, fmt.Errorf("couldn't query cards for trader  %s\n", t.TraderID)
+	}
+	cards := sm.QueryCard{}
+	_ = json.Unmarshal(response.Payload, &cards)
+	return cards, nil
+}

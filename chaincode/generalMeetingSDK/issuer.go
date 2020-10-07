@@ -110,6 +110,22 @@ func (i *Issuer) GeneralMeeting(ccName string, client *channel.Client, dividend 
 	return nil
 }
 
+// GetCards return all cards of issuer
+func (i *Issuer) GetCards(ccName string, client *channel.Client) (sm.QueryCard, error) {
+	response, err := client.Query(channel.Request{
+		ChaincodeID: ccName,
+		Fcn:         "QueryByStockSymbol",
+		Args:        [][]byte{[]byte(i.StockSymbol)},
+		IsInit:      false,
+	})
+	if err != nil {
+		return sm.QueryCard{}, fmt.Errorf("couldn't query cards for issuer %s\n", i.StockSymbol)
+	}
+	cards := sm.QueryCard{}
+	_ = json.Unmarshal(response.Payload, &cards)
+	return cards, nil
+}
+
 //// PayCard Func at the time of payDate
 //func (i *Issuer) PayCard(payDate time.Time) {
 //	cards := QueryByIssuer(*i)
