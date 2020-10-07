@@ -23,6 +23,7 @@ import (
 	"fmt"
 	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
 )
 
 // Trader is a shareholder or someone with TraderID who but dividend
@@ -56,10 +57,10 @@ func RegisterTrader(ccName string, client *channel.Client, traderID string) *Tra
 			ChaincodeID: ccName,
 			Fcn:         "AddCard",
 			Args:        invokeArgs,
-		})
+		}, channel.WithRetry(retry.DefaultChannelOpts))
 
 		if err != nil {
-			fmt.Errorf("Failed to invoke: %+v\n", err)
+			fmt.Errorf("Failed to invoke AddCard : %+v\n", err)
 		}
 
 	}
@@ -84,7 +85,7 @@ func (t *Trader) AddCards(ccName string, client *channel.Client, cards []sm.Card
 				ChaincodeID: ccName,
 				Fcn:         "UpdateFields",
 				Args:        invokeArgs,
-			})
+			}, channel.WithRetry(retry.DefaultChannelOpts))
 
 			if err != nil {
 				return fmt.Errorf("Failed to validate and update card: %+v\n", err)
@@ -104,7 +105,7 @@ func Trading(ccName string, client *channel.Client, seller string, buyer string,
 		ChaincodeID: ccName,
 		Fcn:         "Trade",
 		Args:        invokeArgs,
-	})
+	}, channel.WithRetry(retry.DefaultChannelOpts))
 
 	if err != nil {
 		return fmt.Errorf("Failed to trade card: %+v\n", err)
