@@ -1,9 +1,12 @@
 package generalMeetingSDK
 
 import (
+	"encoding/json"
+	"fmt"
 	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
+	"strconv"
 )
 
 /*
@@ -24,6 +27,7 @@ import (
  * specific language governing permissions and limitations
  * under the License.
  */
+var reservedStockSymbol []byte = []byte("afrouz")
 
 // Issuer is a company that validate and pays Dividend and holds General Meetings
 type Issuer struct {
@@ -32,11 +36,38 @@ type Issuer struct {
 }
 
 // RegisterIssuer is called for new company to join stock market
-func RegisterIssuer(sdk *fabsdk.FabricSDK, client *channel.Client) *Issuer {
-	// todo: read input for stocksymbol and company name
-	// todo: add cards to worldstate for every trader in market
+func RegisterIssuer(ccName string, client *channel.Client, companyName string, stockSymbol string) *Issuer {
+	// add cards to worldstate for every issuer in market
+	response, err := client.Query(channel.Request{
+		ChaincodeID: ccName,
+		Fcn:         "QueryByStockSymbol",
+		Args:        [][]byte{reservedStockSymbol},
+		IsInit:      false,
+	})
+	if err != nil {
+		fmt.Errorf("couldn't query cards for%s", stockSymbol)
+	}
+	cards := sm.QueryCard{}
+	_ = json.Unmarshal(response.Payload, &cards)
+	for _, card := range cards.Cards {
+		invokeArgs := [][]byte{[]byte(card.TraderID), []byte(stockSymbol), []byte("0"), []byte("0")}
+		_, err := client.Execute(channel.Request{
+			ChaincodeID: ccName,
+			Fcn:         "AddCard",
+			Args:        invokeArgs,
+		}, channel.WithRetry(retry.DefaultChannelOpts))
 
-	return nil
+		if err != nil {
+			fmt.Printf("Failed to invoke AddCard for issuer: %+v\n", err)
+		}
+
+	}
+
+	issuer := Issuer{
+		CompanyName: companyName,
+		StockSymbol: stockSymbol,
+	}
+	return &issuer
 }
 
 // ValidateCard Func Validates traders cards if they own this company share or not
@@ -45,17 +76,54 @@ func (i *Issuer) ValidateCard(card sm.Card) bool {
 	return true
 }
 
-// AddCards func add cards for trader of issuer validate it return true
-func (i *Issuer) AddCards(client *channel.Client, cards []sm.Card) bool {
-	//todo: call validateCard
-	//todo: if validated call transaction add card
-	return true
+// GeneralMeeting Func took place and add card to shareholders for dividend and dividendPayment
+func (i *Issuer) GeneralMeeting(ccName string, client *channel.Client, dividend int, payments []sm.DividendPayment) error {
+	response, err := client.Query(channel.Request{
+		ChaincodeID: ccName,
+		Fcn:         "QueryByStockSymbol",
+		Args:        [][]byte{[]byte(i.StockSymbol)},
+		IsInit:      false,
+	})
+	if err != nil {
+		return fmt.Errorf("couldn't query cards for general meeting %s\n", i.StockSymbol)
+	}
+	cards := sm.QueryCard{}
+	_ = json.Unmarshal(response.Payload, &cards)
+	for _, card := range cards.Cards {
+		//if count be zero it means the trader doesn't have any dividend
+		if card.Count != 0 {
+			dividendString := strconv.Itoa(dividend)
+			paymentAsByte, _ := json.Marshal(payments)
+			invokeArgs := [][]byte{[]byte(card.TraderID), []byte(i.StockSymbol), []byte(dividendString), paymentAsByte}
+			_, err := client.Execute(channel.Request{
+				ChaincodeID: ccName,
+				Fcn:         "UpdateDividend",
+				Args:        invokeArgs,
+			}, channel.WithRetry(retry.DefaultChannelOpts))
+
+			if err != nil {
+				return fmt.Errorf("Failed to updateDividend: %+v for card: %+v\n", err, card)
+			}
+		}
+	}
+
+	return nil
 }
 
-// GeneralMeeting Func took place and add card to shareholders for dividend
-func (i *Issuer) GeneralMeeting(client *channel.Client) error {
-	// todo: execute QueryByStockSymbol create a list and loop and update dividend and dividendPayment
-	return nil
+// GetCards return all cards of issuer
+func (i *Issuer) GetCards(ccName string, client *channel.Client) (sm.QueryCard, error) {
+	response, err := client.Query(channel.Request{
+		ChaincodeID: ccName,
+		Fcn:         "QueryByStockSymbol",
+		Args:        [][]byte{[]byte(i.StockSymbol)},
+		IsInit:      false,
+	})
+	if err != nil {
+		return sm.QueryCard{}, fmt.Errorf("couldn't query cards for issuer %s\n", i.StockSymbol)
+	}
+	cards := sm.QueryCard{}
+	_ = json.Unmarshal(response.Payload, &cards)
+	return cards, nil
 }
 
 //// PayCard Func at the time of payDate
