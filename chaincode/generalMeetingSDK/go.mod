@@ -1,6 +1,7 @@
 module fabric-samples/chaincode/generalMeetingSDK
 
 go 1.14
+
 replace github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket => /home/afrouz/go/src/fabric-samples/chaincode/stockmarket
 
 require (
