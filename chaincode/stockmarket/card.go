@@ -84,7 +84,6 @@ func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, tr
 	count, _ := strconv.Atoi(countString)
 	dividend, _ := strconv.Atoi(dividendString)
 	indexName := "trader~stocksymbol"
-	// NOTE: watch out for dividentpaymnet is empty
 	card := Card{TraderID: traderID, Count: count, StockSymbol: stocksymbol, Dividend: dividend, DividendPayments: make([]DividendPayment, 0)}
 	cardAsByte, _ := json.Marshal(card)
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
@@ -139,8 +138,6 @@ func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextIn
 	return cards, nil
 
 }
-
-//todo: how dividendPayment added to buyer or remove from seller
 
 // Trade exchange traded count of a stock symbol from seller to a buyer
 func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, seller string, buyer string, countString string, stockSymbol string) error {
@@ -198,8 +195,8 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	return nil
 }
 
-// update count dividend  and dividendPayment of selected card(traderID,stockSymbol)
-func (sc *StockContract) UpdateFields(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, countString string, dividendString string, payment string) error {
+func (sc *StockContract) UpdateCount(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, countChangeString string) error {
+	fmt.Printf("call updateCount %s", countChangeString)
 	indexName := "trader~stocksymbol"
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{traderID, stockSymbol})
 	response, err := ctx.GetStub().GetState(cardKey)
@@ -211,21 +208,27 @@ func (sc *StockContract) UpdateFields(ctx contractapi.TransactionContextInterfac
 	}
 	responseCard := Card{}
 	_ = json.Unmarshal(response, &responseCard)
-	dividendPayment := DividendPayment{}
-	_ = json.Unmarshal([]byte(payment), &dividendPayment)
-	responseCard.Count, _ = strconv.Atoi(countString)
-	responseCard.Dividend, _ = strconv.Atoi(dividendString)
-	responseCard.DividendPayments = append(responseCard.DividendPayments, dividendPayment)
-	cardAsByte, _ := json.Marshal(responseCard)
-	err = ctx.GetStub().PutState(cardKey, cardAsByte)
-	if err != nil {
-		return fmt.Errorf("failed to put Card to world state %s", err.Error())
+	countChange, _ := strconv.Atoi(countChangeString)
+	responseCard.Count = responseCard.Count + countChange
+	if responseCard.Count <= 0 {
+		return fmt.Errorf("can't update count the count will be negative ")
+	}
+	// if not deleted buying another card maybe cause problem
+	if responseCard.Count == 0 {
+		//sc.deleteDividendPayment(ctx, responseCard)
+	} else {
+		fmt.Printf("can change count")
+		cardAsByte, _ := json.Marshal(responseCard)
+		err = ctx.GetStub().PutState(cardKey, cardAsByte)
+		if err != nil {
+			return fmt.Errorf("failed to put Card to world state %s", err.Error())
+		}
 	}
 	return nil
 }
 
-// UpdateDividend Update given trader and stocksymbol update dividend  and dividendPayment field
-func (sc *StockContract) UpdateDividend(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, dividendString string, payment string) error {
+// UpdateDividend Update given trader and stocksymbol update dividend field
+func (sc *StockContract) UpdateDividend(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, dividendString string) error {
 	indexName := "trader~stocksymbol"
 	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{traderID, stockSymbol})
 	response, err := ctx.GetStub().GetState(cardKey)
@@ -237,10 +240,8 @@ func (sc *StockContract) UpdateDividend(ctx contractapi.TransactionContextInterf
 	}
 	responseCard := Card{}
 	_ = json.Unmarshal(response, &responseCard)
-	dividendPayment := DividendPayment{}
-	_ = json.Unmarshal([]byte(payment), &dividendPayment)
-	responseCard.Dividend, _ = strconv.Atoi(dividendString)
-	responseCard.DividendPayments = append(responseCard.DividendPayments, dividendPayment)
+	dividend, _ := strconv.Atoi(dividendString)
+	responseCard.Dividend = dividend
 	cardAsByte, _ := json.Marshal(responseCard)
 	err = ctx.GetStub().PutState(cardKey, cardAsByte)
 	if err != nil {
@@ -249,10 +250,9 @@ func (sc *StockContract) UpdateDividend(ctx contractapi.TransactionContextInterf
 	return nil
 }
 
-// AddDividendPayment func will append given slice of payments to the card
-func (sc *StockContract) AddDividendPayment(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string, payment string) error {
+func (sc *StockContract) addDividendPayment(ctx contractapi.TransactionContextInterface, card *Card, dPayments []DividendPayment) error {
 	indexName := "trader~stocksymbol"
-	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{traderID, stockSymbol})
+	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
 	response, err := ctx.GetStub().GetState(cardKey)
 	if err != nil {
 		return fmt.Errorf("failed to get Card from world state %s", err.Error())
@@ -262,9 +262,9 @@ func (sc *StockContract) AddDividendPayment(ctx contractapi.TransactionContextIn
 	}
 	responseCard := Card{}
 	_ = json.Unmarshal(response, &responseCard)
-	dividendPayment := DividendPayment{}
-	_ = json.Unmarshal([]byte(payment), &dividendPayment)
-	responseCard.DividendPayments = append(responseCard.DividendPayments, dividendPayment)
+	for _, dPayment := range dPayments {
+		responseCard.DividendPayments = append(responseCard.DividendPayments, dPayment)
+	}
 	cardAsByte, _ := json.Marshal(responseCard)
 	err = ctx.GetStub().PutState(cardKey, cardAsByte)
 	if err != nil {
@@ -273,9 +273,9 @@ func (sc *StockContract) AddDividendPayment(ctx contractapi.TransactionContextIn
 	return nil
 }
 
-func (sc *StockContract) DeleteDividendPayment(ctx contractapi.TransactionContextInterface, traderID string, stockSymbol string) error {
+func (sc *StockContract) deleteDividendPayment(ctx contractapi.TransactionContextInterface, card *Card) error {
 	indexName := "trader~stocksymbol"
-	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{traderID, stockSymbol})
+	cardKey, _ := ctx.GetStub().CreateCompositeKey(indexName, []string{card.TraderID, card.StockSymbol})
 	response, err := ctx.GetStub().GetState(cardKey)
 	if err != nil {
 		return fmt.Errorf("failed to get Card from world state %s", err.Error())

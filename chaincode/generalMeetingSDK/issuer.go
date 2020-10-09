@@ -1,4 +1,4 @@
-package generalMeetingSDK
+package main
 
 import (
 	"encoding/json"
