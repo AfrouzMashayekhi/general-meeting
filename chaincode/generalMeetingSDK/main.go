@@ -2,57 +2,51 @@ package main
 
 import (
 	"fmt"
+	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/ledger"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
-	"os"
+	"time"
 )
 
 func setup(user string, org string, channelName string, secret string) (*fabsdk.FabricSDK, *channel.Client, error) {
-	//if len(os.Args) != 5 {
-	//	fmt.Printf("Usage: main.go <user-name> <user-secret> <org> <channel> <chaincode-name>\n")
-	//	os.Exit(1)
-	//}
+
 	sdk, err := fabsdk.New(config.FromFile("./config.yaml"))
 	if err != nil {
-		fmt.Printf("Failed to create new SDK: %s\n", err)
-		os.Exit(1)
+		return nil, nil, fmt.Errorf("Failed to create new SDK: %s\n", err)
 	}
-	//defer sdk.Close()
-	fmt.Printf("fabsdk creation succeded %+v ", sdk)
-	clientChannelContext := sdk.ChannelContext(channelName, fabsdk.WithUser(user), fabsdk.WithOrg(org))
-	//ledgerClient, err := ledger.New(clientChannelContext)
-	//if err != nil {
-	//	return nil, nil, fmt.Errorf("failed to create channel %s client %#v", channelName, err)
-	//}
-	//queryChannelInfo(ledgerClient)
-	//queryChannelConfig(ledgerClient)
-	fmt.Printf("fabsdk creation succeded %+v ", sdk)
+
+	setupLogLevel()
 	err = enrollUser(sdk, user, secret)
 	if err != nil {
 		fmt.Printf("can't enroll user %s\n", err)
 	}
-	client, err := channel.New(clientChannelContext)
+	clientChannelContext := sdk.ChannelContext(channelName, fabsdk.WithUser(user), fabsdk.WithOrg(org))
+
+	ledgerClient, err := ledger.New(clientChannelContext)
 	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create channel %s client %#v", channelName, err)
+	}
+	queryChannelInfo(ledgerClient)
+	//queryChannelConfig(ledgerClient)
+
+	client, errorClient := channel.New(clientChannelContext)
+
+	if errorClient != nil {
 		return nil, nil, fmt.Errorf("failed to create channel %s", channelName)
 	}
-	//if org == "trader" {
-	//	//todo: how to get traderID or companyName
-	//	RegisterTrader(sdk, client, secret, user)
-	//
-	//} else if org == "company" {
-	//	//todo: hardocod names
-	//	RegisterIssuer(sdk, client, secret, user)
-	//} else {
-	//	return cc, nil, fmt.Errorf("org name not valid")
-	//}
-	fmt.Printf("fabsdk creation succeded %+v ", client)
 
 	return sdk, client, nil
 }
-
+func setupLogLevel() {
+	logging.SetLevel("fabsdk", logging.INFO)
+	logging.SetLevel("fabsdk/common", logging.INFO)
+	logging.SetLevel("fabsdk/fab", logging.INFO)
+	logging.SetLevel("fabsdk/client", logging.INFO)
+}
 func queryChannelConfig(ledgerClient *ledger.Client) {
 	resp1, err := ledgerClient.QueryConfig()
 	if err != nil {
@@ -102,111 +96,108 @@ func enrollUser(sdk *fabsdk.FabricSDK, user string, secret string) error {
 func main() {
 	userName := "user1"
 	orgName := "trader"
-	ccName := "stock"
+	channelName := "mychannel"
 	secret := "user1pw"
+	ccName := "stock"
 	//todo: call setup
 	fmt.Println("setting up...")
-	sdk, client, err := setup(userName, orgName, ccName, secret)
+	sdk, client, err := setup(userName, orgName, channelName, secret)
 	if err != nil {
 		fmt.Println("can't setup chaincode %+v , %+v", sdk, client)
 	}
-	//err = enrollUser(sdk, userName)
-	//if err != nil {
-	//	fmt.Printf("can't enroll user %s\n", err)
-	//}
-	//
-	//mhmmd := RegisterTrader(ccName, client, "mhmmd")
-	//mhmmdCards := []sm.Card{{
-	//	TraderID:    "mhmmd",
-	//	Count:       300,
-	//	StockSymbol: "afrouz",
-	//	Dividend:    100,
-	//	DividendPayments: []sm.DividendPayment{{
-	//		Percentage: 0.8,
-	//		PDate:      time.Date(2020, 12, 20, 0, 0, 0, 0, time.UTC),
-	//	}, {
-	//		Percentage: 0.2,
-	//		PDate:      time.Date(2020, 11, 12, 0, 0, 0, 0, time.UTC),
-	//	}},
-	//}}
-	//err = mhmmd.AddCards(ccName, client, mhmmdCards)
-	//if err != nil {
-	//	fmt.Printf("can't add cards of %s ,%s\n", mhmmd.TraderID, err)
-	//}
-	//mhmmdQuery, err := mhmmd.GetCards(ccName, client)
-	//if err != nil {
-	//	fmt.Printf("can't query cards of %s ,%s\n", mhmmd.TraderID, err)
-	//}
-	//fmt.Println(mhmmdQuery)
-	//msft := RegisterIssuer(ccName, client, "micorsoft", "msft")
-	//mhmmdQuery, err = mhmmd.GetCards(ccName, client)
-	//if err != nil {
-	//	fmt.Printf("can't query cards of %s ,%s\n", mhmmd.TraderID, err)
-	//}
-	//fmt.Println(mhmmdQuery)
-	//
-	//msftPayments := []sm.DividendPayment{{
-	//	Percentage: 0.5,
-	//	PDate:      time.Date(2020, 10, 13, 0, 0, 0, 0, time.UTC),
-	//}, {
-	//	Percentage: 0.5,
-	//	PDate:      time.Date(2020, 10, 28, 0, 0, 0, 0, time.UTC),
-	//}}
-	//err = msft.GeneralMeeting(ccName, client, 100, msftPayments)
-	//if err != nil {
-	//	fmt.Printf("generalmeeting did not hold of %s ,%s\n", msft.CompanyName, err)
-	//}
-	//msftQuery, err := msft.GetCards(ccName, client)
-	//if err != nil {
-	//	fmt.Printf("can't query cards of %s ,%s\n", msft.CompanyName, err)
-	//}
-	//fmt.Println(msftQuery)
-	//moosa := RegisterTrader(ccName, client, "moosa")
-	//moosaCards := []sm.Card{{
-	//	TraderID:    "moosa",
-	//	Count:       500,
-	//	StockSymbol: "msft",
-	//	Dividend:    200,
-	//	DividendPayments: []sm.DividendPayment{{
-	//		Percentage: 0.6,
-	//		PDate:      time.Date(2020, 12, 20, 0, 0, 0, 0, time.UTC),
-	//	}, {
-	//		Percentage: 0.4,
-	//		PDate:      time.Date(2020, 11, 12, 0, 0, 0, 0, time.UTC),
-	//	}},
-	//}}
-	//err = moosa.AddCards(ccName, client, moosaCards)
-	//if err != nil {
-	//	fmt.Printf("can't add cards of %s ,%s\n", moosa.TraderID, err)
-	//}
-	//moosaQuery, err := moosa.GetCards(ccName, client)
-	//if err != nil {
-	//	fmt.Printf("can't query cards of %s ,%s\n", moosa.TraderID, err)
-	//}
-	//fmt.Println(moosaQuery)
-	//msftQuery, err = msft.GetCards(ccName, client)
-	//if err != nil {
-	//	fmt.Printf("can't query cards of %s ,%s\n", msft.CompanyName, err)
-	//}
-	//fmt.Println(msftQuery)
-	//err = Trading(ccName, client, moosa.TraderID, mhmmd.TraderID, 200, msft.StockSymbol)
-	//if err != nil {
-	//	fmt.Printf("can't trade of %s ,%s , %s,%s\n", moosa.TraderID, mhmmd.TraderID, msft.StockSymbol, err)
-	//}
-	//moosaQuery, err = moosa.GetCards(ccName, client)
-	//if err != nil {
-	//	fmt.Printf("can't query cards of %s ,%s\n", moosa.TraderID, err)
-	//}
-	//fmt.Println(moosaQuery)
-	//mhmmdQuery, err = mhmmd.GetCards(ccName, client)
-	//if err != nil {
-	//	fmt.Printf("can't query cards of %s ,%s\n", mhmmd.TraderID, err)
-	//}
-	//fmt.Println(mhmmdQuery)
-	//msftQuery, err = msft.GetCards(ccName, client)
-	//if err != nil {
-	//	fmt.Printf("can't query cards of %s ,%s\n", msft.CompanyName, err)
-	//}
-	//fmt.Println(msftQuery)
+	mhmmd := RegisterTrader(ccName, client, "mhmmd")
+	mhmmdCards := []sm.Card{{
+		TraderID:    "mhmmd",
+		Count:       300,
+		StockSymbol: "afrouz",
+		Dividend:    100,
+		DividendPayments: []sm.DividendPayment{{
+			Percentage: 0.8,
+			PDate:      time.Date(2020, 12, 20, 0, 0, 0, 0, time.UTC),
+		}, {
+			Percentage: 0.2,
+			PDate:      time.Date(2020, 11, 12, 0, 0, 0, 0, time.UTC),
+		}},
+	}}
+	err = mhmmd.AddCards(ccName, client, mhmmdCards)
+	if err != nil {
+		fmt.Printf("can't add cards of %s ,%s\n", mhmmd.TraderID, err)
+	}
+	mhmmdQuery, err := mhmmd.GetCards(ccName, client)
+	if err != nil {
+		fmt.Printf("can't query cards of %s ,%s\n", mhmmd.TraderID, err)
+	}
+	fmt.Println(mhmmdQuery)
+	msft := RegisterIssuer(ccName, client, "micorsoft", "msft")
+	mhmmdQuery, err = mhmmd.GetCards(ccName, client)
+	if err != nil {
+		fmt.Printf("can't query cards of %s ,%s\n", mhmmd.TraderID, err)
+	}
+	fmt.Println(mhmmdQuery)
+
+	msftPayments := []sm.DividendPayment{{
+		Percentage: 0.5,
+		PDate:      time.Date(2020, 10, 13, 0, 0, 0, 0, time.UTC),
+	}, {
+		Percentage: 0.5,
+		PDate:      time.Date(2020, 10, 28, 0, 0, 0, 0, time.UTC),
+	}}
+	err = msft.GeneralMeeting(ccName, client, 100, msftPayments)
+	if err != nil {
+		fmt.Printf("generalmeeting did not hold of %s ,%s\n", msft.CompanyName, err)
+	}
+	msftQuery, err := msft.GetCards(ccName, client)
+	if err != nil {
+		fmt.Printf("can't query cards of %s ,%s\n", msft.CompanyName, err)
+	}
+	fmt.Println(msftQuery)
+	moosa := RegisterTrader(ccName, client, "moosa")
+	moosaCards := []sm.Card{{
+		TraderID:    "moosa",
+		Count:       500,
+		StockSymbol: "msft",
+		Dividend:    200,
+		DividendPayments: []sm.DividendPayment{{
+			Percentage: 0.6,
+			PDate:      time.Date(2020, 12, 20, 0, 0, 0, 0, time.UTC),
+		}, {
+			Percentage: 0.4,
+			PDate:      time.Date(2020, 11, 12, 0, 0, 0, 0, time.UTC),
+		}},
+	}}
+	err = moosa.AddCards(ccName, client, moosaCards)
+	if err != nil {
+		fmt.Printf("can't add cards of %s ,%s\n", moosa.TraderID, err)
+	}
+	moosaQuery, err := moosa.GetCards(ccName, client)
+	if err != nil {
+		fmt.Printf("can't query cards of %s ,%s\n", moosa.TraderID, err)
+	}
+	fmt.Println(moosaQuery)
+	msftQuery, err = msft.GetCards(ccName, client)
+	if err != nil {
+		fmt.Printf("can't query cards of %s ,%s\n", msft.CompanyName, err)
+	}
+	fmt.Println(msftQuery)
+	err = Trading(ccName, client, moosa.TraderID, mhmmd.TraderID, 200, msft.StockSymbol)
+	if err != nil {
+		fmt.Printf("can't trade of %s ,%s , %s,%s\n", moosa.TraderID, mhmmd.TraderID, msft.StockSymbol, err)
+	}
+	moosaQuery, err = moosa.GetCards(ccName, client)
+	if err != nil {
+		fmt.Printf("can't query cards of %s ,%s\n", moosa.TraderID, err)
+	}
+	fmt.Println(moosaQuery)
+	mhmmdQuery, err = mhmmd.GetCards(ccName, client)
+	if err != nil {
+		fmt.Printf("can't query cards of %s ,%s\n", mhmmd.TraderID, err)
+	}
+	fmt.Println(mhmmdQuery)
+	msftQuery, err = msft.GetCards(ccName, client)
+	if err != nil {
+		fmt.Printf("can't query cards of %s ,%s\n", msft.CompanyName, err)
+	}
+	fmt.Println(msftQuery)
+	defer sdk.Close()
 
 }

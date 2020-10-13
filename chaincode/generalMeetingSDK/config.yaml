@@ -273,7 +273,7 @@ channels:
 #
 organizations:
   trader:
-    mspid: trader.share.com
+    mspID: TraderMSP
     # This org's MSP store (absolute path or relative to client.cryptoconfig)
     cryptoPath:  ${GOPATH}/src/fabric-samples/my-network/organizations/peerOrganizations/trader.share.com/users/User1@trader.share.com/msp
     peers:
@@ -288,7 +288,7 @@ organizations:
       - ca.trader.share.com
 
   company:
-    mspid: company.share.com
+    mspID: CompanyMSP
     # This org's MSP store (absolute path or relative to client.cryptoconfig)
     cryptoPath:  ${GOPATH}/src/fabric-samples/my-network/organizations/peerOrganizations/company.share.com/users/User1@company.share.com/msp
     peers:
@@ -303,7 +303,7 @@ organizations:
       - ca.company.share.com
 
   regulator:
-    mspid: regulator.share.com
+    mspID: RegulatorMSP
     # This org's MSP store (absolute path or relative to client.cryptoconfig)
     cryptoPath:  ${GOPATH}/src/fabric-samples/my-network/organizations/peerOrganizations/regulator.share.com/users/User1@regulator.share.com/msp
     peers:
@@ -318,7 +318,7 @@ organizations:
       - ca.regulator.share.com
 
   # Orderer Org name
-  ordererorg:
+  ordererOrg:
     # Membership Service Provider ID for this organization
     mspID: OrdererMSP
 
@@ -443,17 +443,17 @@ certificateAuthorities:
 entityMatchers:
   peer:
     - pattern: (\w+).trader.share.com:(\d+)
-      urlSubstitutionExp: ${1}.trader.share.com:${2}
+      urlSubstitutionExp: peer0.trader.share.com:${2}
       sslTargetOverrideUrlSubstitutionExp: ${1}.trader.share.com
       mappedHost: peer0.trader.share.com
 
     - pattern: (\w+).company.share.com:(\d+)
-      urlSubstitutionExp: ${1}.company.share.com:${2}
+      urlSubstitutionExp: peer0.company.share.com:${2}
       sslTargetOverrideUrlSubstitutionExp: ${1}.company.share.com
       mappedHost: peer0.company.share.com
 
     - pattern: (\w+).regulator.share.com:(\d+)
-      urlSubstitutionExp: ${1}.regulator.share.com:${2}
+      urlSubstitutionExp: peer0.regulator.share.com:${2}
       sslTargetOverrideUrlSubstitutionExp: ${1}.regulator.share.com
       mappedHost: peer0.regulator.share.com
 
@@ -466,17 +466,17 @@ entityMatchers:
 
   certificateAuthority:
     - pattern: (\w+).trader.share.(\w+)
-      urlSubstitutionExp: https://localhost:7054
+      urlSubstitutionExp: ca.trader.share.com:7054
 #      sslTargetOverrideUrlSubstitutionExp: ca.trader.share.com
       mappedHost: ca.trader.share.com
 
     - pattern: (\w+).company.share.(\w+)
-      urlSubstitutionExp: https://localhost:10054
+      urlSubstitutionExp: ca.company.share.com:10054
 #      sslTargetOverrideUrlSubstitutionExp: ca.company.share.com
       mappedHost: ca.company.share.com
 
     - pattern: (\w+).regulator.share.(\w+)
-      urlSubstitutionExp: https://localhost:8054
+      urlSubstitutionExp: ca.regualtor.share.com:8054
 #      sslTargetOverrideUrlSubstitutionExp: ca.regulator.share.com
       mappedHost: ca.regualtor.share.com
 ###############################################################################
