@@ -105,6 +105,7 @@ func main() {
 	if err != nil {
 		fmt.Println("can't setup chaincode %+v , %+v", sdk, client)
 	}
+	//fmt.Printf(ccName)
 	mhmmd := RegisterTrader(ccName, client, "mhmmd")
 	mhmmdCards := []sm.Card{{
 		TraderID:    "mhmmd",

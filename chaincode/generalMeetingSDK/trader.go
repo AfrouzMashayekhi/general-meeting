@@ -24,6 +24,7 @@ import (
 	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
+	"strconv"
 )
 
 // Trader is a shareholder or someone with TraderID who but dividend
@@ -47,12 +48,12 @@ func RegisterTrader(ccName string, client *channel.Client, traderID string) *Tra
 		IsInit:      false,
 	})
 	if err != nil {
-		fmt.Errorf("couldn't query cards for%s", traderID)
+		fmt.Errorf("couldn't query cards for%s %s", reservedTraderID, err)
 	}
 	cards := sm.QueryCard{}
 	_ = json.Unmarshal(response.Payload, &cards)
 	for _, card := range cards.Cards {
-		invokeArgs := [][]byte{[]byte(traderID), []byte(card.StockSymbol), []byte("0"), []byte("0")}
+		invokeArgs := [][]byte{[]byte(traderID), []byte("0"), []byte(card.StockSymbol), []byte("0")}
 		_, err := client.Execute(channel.Request{
 			ChaincodeID: ccName,
 			Fcn:         "AddCard",
@@ -80,7 +81,9 @@ func (t *Trader) AddCards(ccName string, client *channel.Client, cards []sm.Card
 		}
 		if issuer.ValidateCard(card) {
 			paymentAsByte, _ := json.Marshal(card.DividendPayments)
-			invokeArgs := [][]byte{[]byte(card.TraderID), []byte(card.StockSymbol), []byte(string(card.Count)), []byte(string(card.Dividend)), paymentAsByte}
+			countString := strconv.Itoa(card.Count)
+			dividendString := strconv.Itoa(card.Dividend)
+			invokeArgs := [][]byte{[]byte(card.TraderID), []byte(card.StockSymbol), []byte(countString), []byte(dividendString), paymentAsByte}
 			_, err := client.Execute(channel.Request{
 				ChaincodeID: ccName,
 				Fcn:         "UpdateFields",
@@ -100,7 +103,8 @@ func (t *Trader) AddCards(ccName string, client *channel.Client, cards []sm.Card
 // Trading trade from seller to buyer the buyCount mount if succeeded return true
 // should it be function or method for seller? no it should be func it calls from outside
 func Trading(ccName string, client *channel.Client, seller string, buyer string, buyCount int, stockSymbol string) error {
-	invokeArgs := [][]byte{[]byte(seller), []byte(buyer), []byte(string(buyCount)), []byte(stockSymbol)}
+	countString := strconv.Itoa(buyCount)
+	invokeArgs := [][]byte{[]byte(seller), []byte(buyer), []byte(countString), []byte(stockSymbol)}
 	_, err := client.Execute(channel.Request{
 		ChaincodeID: ccName,
 		Fcn:         "Trade",
@@ -117,12 +121,12 @@ func Trading(ccName string, client *channel.Client, seller string, buyer string,
 func (t *Trader) GetCards(ccName string, client *channel.Client) (sm.QueryCard, error) {
 	response, err := client.Query(channel.Request{
 		ChaincodeID: ccName,
-		Fcn:         "QueryByTraderID",
+		Fcn:         "QueryByTrader",
 		Args:        [][]byte{[]byte(t.TraderID)},
 		IsInit:      false,
 	})
 	if err != nil {
-		return sm.QueryCard{}, fmt.Errorf("couldn't query cards for trader  %s\n", t.TraderID)
+		return sm.QueryCard{}, fmt.Errorf("couldn't query cards for trader  %s %s\n", t.TraderID, err)
 	}
 	cards := sm.QueryCard{}
 	_ = json.Unmarshal(response.Payload, &cards)

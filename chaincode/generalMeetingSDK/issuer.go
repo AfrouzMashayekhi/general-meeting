@@ -50,7 +50,7 @@ func RegisterIssuer(ccName string, client *channel.Client, companyName string, s
 	cards := sm.QueryCard{}
 	_ = json.Unmarshal(response.Payload, &cards)
 	for _, card := range cards.Cards {
-		invokeArgs := [][]byte{[]byte(card.TraderID), []byte(stockSymbol), []byte("0"), []byte("0")}
+		invokeArgs := [][]byte{[]byte(card.TraderID), []byte("0"), []byte(stockSymbol), []byte("0")}
 		_, err := client.Execute(channel.Request{
 			ChaincodeID: ccName,
 			Fcn:         "AddCard",

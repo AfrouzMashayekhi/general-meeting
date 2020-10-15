@@ -466,17 +466,17 @@ entityMatchers:
 
   certificateAuthority:
     - pattern: (\w+).trader.share.(\w+)
-      urlSubstitutionExp: ca.trader.share.com:7054
+      urlSubstitutionExp: https://localhost:7054
 #      sslTargetOverrideUrlSubstitutionExp: ca.trader.share.com
       mappedHost: ca.trader.share.com
 
     - pattern: (\w+).company.share.(\w+)
-      urlSubstitutionExp: ca.company.share.com:10054
+      urlSubstitutionExp: https://localhost:10054
 #      sslTargetOverrideUrlSubstitutionExp: ca.company.share.com
       mappedHost: ca.company.share.com
 
     - pattern: (\w+).regulator.share.(\w+)
-      urlSubstitutionExp: ca.regualtor.share.com:8054
+      urlSubstitutionExp: https://localhost:8054
 #      sslTargetOverrideUrlSubstitutionExp: ca.regulator.share.com
       mappedHost: ca.regualtor.share.com
 ###############################################################################
