@@ -59,6 +59,10 @@ type DividendPayment struct {
 	//Paid bool `json:"paid"`
 }
 
+//type QueryCard struct {
+//	Cards []Card `json:"cards"`
+//}
+
 // InitLedger create all cards with TraderID and Issuer and other attr nil
 func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	// add a reserved card for query and adding issuer and trader
@@ -189,6 +193,8 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 		buyerResponseCard := Card{}
 		_ = json.Unmarshal(buyerResponse, &buyerResponseCard)
 		buyerResponseCard.Count += count
+		//todo add dividendPayment
+		buyerResponseCard.DividendPayments = append(buyerResponseCard.DividendPayments, sellerResponseCard.DividendPayments...)
 		cardAsByte, _ := json.Marshal(buyerResponseCard)
 		err = ctx.GetStub().PutState(buyerCardKey, cardAsByte)
 		if err != nil {
@@ -211,16 +217,17 @@ func (sc *StockContract) UpdateFields(ctx contractapi.TransactionContextInterfac
 	}
 	responseCard := Card{}
 	_ = json.Unmarshal(response, &responseCard)
-	dividendPayment := DividendPayment{}
+	dividendPayment := []DividendPayment{}
 	_ = json.Unmarshal([]byte(payment), &dividendPayment)
 	responseCard.Count, _ = strconv.Atoi(countString)
 	responseCard.Dividend, _ = strconv.Atoi(dividendString)
-	responseCard.DividendPayments = append(responseCard.DividendPayments, dividendPayment)
+	responseCard.DividendPayments = append(responseCard.DividendPayments, dividendPayment...)
 	cardAsByte, _ := json.Marshal(responseCard)
 	err = ctx.GetStub().PutState(cardKey, cardAsByte)
 	if err != nil {
 		return fmt.Errorf("failed to put Card to world state %s", err.Error())
 	}
+
 	return nil
 }
 
@@ -237,10 +244,10 @@ func (sc *StockContract) UpdateDividend(ctx contractapi.TransactionContextInterf
 	}
 	responseCard := Card{}
 	_ = json.Unmarshal(response, &responseCard)
-	dividendPayment := DividendPayment{}
+	dividendPayment := []DividendPayment{}
 	_ = json.Unmarshal([]byte(payment), &dividendPayment)
 	responseCard.Dividend, _ = strconv.Atoi(dividendString)
-	responseCard.DividendPayments = append(responseCard.DividendPayments, dividendPayment)
+	responseCard.DividendPayments = append(responseCard.DividendPayments, dividendPayment...)
 	cardAsByte, _ := json.Marshal(responseCard)
 	err = ctx.GetStub().PutState(cardKey, cardAsByte)
 	if err != nil {
@@ -262,9 +269,9 @@ func (sc *StockContract) AddDividendPayment(ctx contractapi.TransactionContextIn
 	}
 	responseCard := Card{}
 	_ = json.Unmarshal(response, &responseCard)
-	dividendPayment := DividendPayment{}
+	dividendPayment := []DividendPayment{}
 	_ = json.Unmarshal([]byte(payment), &dividendPayment)
-	responseCard.DividendPayments = append(responseCard.DividendPayments, dividendPayment)
+	responseCard.DividendPayments = append(responseCard.DividendPayments, dividendPayment...)
 	cardAsByte, _ := json.Marshal(responseCard)
 	err = ctx.GetStub().PutState(cardKey, cardAsByte)
 	if err != nil {

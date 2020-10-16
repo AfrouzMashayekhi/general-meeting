@@ -113,13 +113,15 @@ func main() {
 		StockSymbol: "afrouz",
 		Dividend:    100,
 		DividendPayments: []sm.DividendPayment{{
-			Percentage: 0.8,
+			Percentage: 1.8,
 			PDate:      time.Date(2020, 12, 20, 0, 0, 0, 0, time.UTC),
 		}, {
 			Percentage: 0.2,
 			PDate:      time.Date(2020, 11, 12, 0, 0, 0, 0, time.UTC),
 		}},
 	}}
+
+	//fmt.Println(mhmmdCards.TRaderID)
 	err = mhmmd.AddCards(ccName, client, mhmmdCards)
 	if err != nil {
 		fmt.Printf("can't add cards of %s ,%s\n", mhmmd.TraderID, err)
@@ -143,15 +145,7 @@ func main() {
 		Percentage: 0.5,
 		PDate:      time.Date(2020, 10, 28, 0, 0, 0, 0, time.UTC),
 	}}
-	err = msft.GeneralMeeting(ccName, client, 100, msftPayments)
-	if err != nil {
-		fmt.Printf("generalmeeting did not hold of %s ,%s\n", msft.CompanyName, err)
-	}
-	msftQuery, err := msft.GetCards(ccName, client)
-	if err != nil {
-		fmt.Printf("can't query cards of %s ,%s\n", msft.CompanyName, err)
-	}
-	fmt.Println(msftQuery)
+
 	moosa := RegisterTrader(ccName, client, "moosa")
 	moosaCards := []sm.Card{{
 		TraderID:    "moosa",
@@ -175,11 +169,16 @@ func main() {
 		fmt.Printf("can't query cards of %s ,%s\n", moosa.TraderID, err)
 	}
 	fmt.Println(moosaQuery)
-	msftQuery, err = msft.GetCards(ccName, client)
+	err = msft.GeneralMeeting(ccName, client, 100, msftPayments)
+	if err != nil {
+		fmt.Printf("generalmeeting did not hold of %s ,%s\n", msft.CompanyName, err)
+	}
+	msftQuery, err := msft.GetCards(ccName, client)
 	if err != nil {
 		fmt.Printf("can't query cards of %s ,%s\n", msft.CompanyName, err)
 	}
 	fmt.Println(msftQuery)
+
 	err = Trading(ccName, client, moosa.TraderID, mhmmd.TraderID, 200, msft.StockSymbol)
 	if err != nil {
 		fmt.Printf("can't trade of %s ,%s , %s,%s\n", moosa.TraderID, mhmmd.TraderID, msft.StockSymbol, err)

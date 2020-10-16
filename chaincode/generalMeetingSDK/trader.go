@@ -80,7 +80,9 @@ func (t *Trader) AddCards(ccName string, client *channel.Client, cards []sm.Card
 			StockSymbol: card.StockSymbol,
 		}
 		if issuer.ValidateCard(card) {
+			//fmt.Println(card.DividendPayments)
 			paymentAsByte, _ := json.Marshal(card.DividendPayments)
+			//fmt.Println(paymentAsByte)
 			countString := strconv.Itoa(card.Count)
 			dividendString := strconv.Itoa(card.Dividend)
 			invokeArgs := [][]byte{[]byte(card.TraderID), []byte(card.StockSymbol), []byte(countString), []byte(dividendString), paymentAsByte}
