@@ -20,3 +20,27 @@
 [{"Key":"\u0000trader~stocksymbol\u00001\u0000goog\u0000","Record":{"traderID":"1","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}},{"Key":"\u0000trader~stocksymbol\u00002\u0000goog\u0000","Record":{"traderID":"2","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}},{"Key":"\u0000trader~stocksymbol\u00003\u0000goog\u0000","Record":{"traderID":"3","count":0,"stockSymbol":"goog","dividend":200,"dividendPayment":[]}}]
 /tmp/fabric:$ 
 
+
+
+register mhmmd trader..
+update cards of mhmmd %+v [{mhmmd 300 afrouz 100 [{1.8 2020-12-20 00:00:00 +0000 UTC} {0.2 2020-11-12 00:00:00 +0000 UTC}]}]
+Get mhmmd cards from world state:
+{[{mhmmd 0 0 0 []} {mhmmd 300 afrouz 100 [{1.8 2020-12-20 00:00:00 +0000 UTC} {0.2 2020-11-12 00:00:00 +0000 UTC}]} {mhmmd 0 msft 0 []}]}
+register msft issuer
+Get Cards of mhmmd after registering msft issuer:
+{[{mhmmd 0 0 0 []} {mhmmd 300 afrouz 100 [{1.8 2020-12-20 00:00:00 +0000 UTC} {0.2 2020-11-12 00:00:00 +0000 UTC}]} {mhmmd 0 msft 0 []}]}
+Register trader Moosa
+Update cards of Moosa %v [{moosa 500 msft 200 [{0.6 2020-12-20 00:00:00 +0000 UTC} {0.4 2020-11-12 00:00:00 +0000 UTC}]}]
+Get Cards of Moosa from worldstate
+{[{moosa 0 0 0 []} {moosa 0 afrouz 0 []} {moosa 500 msft 200 [{0.6 2020-12-20 00:00:00 +0000 UTC} {0.4 2020-11-12 00:00:00 +0000 UTC}]}]}
+Holding general Meeting for msft
+Get Cards of MSFT after General Meeting
+{[{afrouz 0 msft 0 []} {mhmmd 0 msft 0 []} {moosa 500 msft 100 [{0.6 2020-12-20 00:00:00 +0000 UTC} {0.4 2020-11-12 00:00:00 +0000 UTC} {0.5 2020-10-13 00:00:00 +0000 UTC} {0.5 2020-10-28 00:00:00 +0000 UTC}]}]}
+Trading 200 number of MSFT company from Moosa To Mhmmd
+Get Cards of Moosa after Trading
+{[{moosa 0 0 0 []} {moosa 0 afrouz 0 []} {moosa 300 msft 100 [{0.6 2020-12-20 00:00:00 +0000 UTC} {0.4 2020-11-12 00:00:00 +0000 UTC} {0.5 2020-10-13 00:00:00 +0000 UTC} {0.5 2020-10-28 00:00:00 +0000 UTC}]}]}
+
+Get Cards of Mhmmd after trading from World State
+{[{mhmmd 0 0 0 []} {mhmmd 300 afrouz 100 [{1.8 2020-12-20 00:00:00 +0000 UTC} {0.2 2020-11-12 00:00:00 +0000 UTC}]} {mhmmd 200 msft 0 [{0.6 2020-12-20 00:00:00 +0000 UTC} {0.4 2020-11-12 00:00:00 +0000 UTC} {0.5 2020-10-13 00:00:00 +0000 UTC} {0.5 2020-10-28 00:00:00 +0000 UTC}]}]}
+Get Cards of MSFT after trading from World State
+{[{afrouz 0 msft 0 []} {mhmmd 200 msft 0 [{0.6 2020-12-20 00:00:00 +0000 UTC} {0.4 2020-11-12 00:00:00 +0000 UTC} {0.5 2020-10-13 00:00:00 +0000 UTC} {0.5 2020-10-28 00:00:00 +0000 UTC}]} {moosa 300 msft 100 [{0.6 2020-12-20 00:00:00 +0000 UTC} {0.4 2020-11-12 00:00:00 +0000 UTC} {0.5 2020-10-13 00:00:00 +0000 UTC} {0.5 2020-10-28 00:00:00 +0000 UTC}]}]}
