@@ -81,8 +81,6 @@ func (sc *StockContract) InitLedger(ctx contractapi.TransactionContextInterface)
 
 }
 
-//todo: new trader register for adding cards, new issuer register, for dividend update it?
-
 // AddCard calls putState of chaincode to add card maybe create a string to push in worldstate
 func (sc *StockContract) AddCard(ctx contractapi.TransactionContextInterface, traderID string, countString string, stocksymbol string, dividendString string) error {
 	count, _ := strconv.Atoi(countString)
@@ -144,8 +142,6 @@ func (sc *StockContract) QueryByStockSymbol(ctx contractapi.TransactionContextIn
 
 }
 
-//todo: how dividendPayment added to buyer or remove from seller
-
 // Trade exchange traded count of a stock symbol from seller to a buyer
 func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, seller string, buyer string, countString string, stockSymbol string) error {
 	indexName := "trader~stocksymbol"
@@ -169,7 +165,13 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 	}
 	// if not deleted buying another card maybe cause problem
 	if sellerResponseCard.Count == 0 {
-		// todo: delete dividend
+		fmt.Printf("Can Trader from seller \n")
+		sellerResponseCard.DividendPayments = make([]DividendPayment, 0)
+		cardAsByte, _ := json.Marshal(sellerResponseCard)
+		err = ctx.GetStub().PutState(sellerCardKey, cardAsByte)
+		if err != nil {
+			return fmt.Errorf("failed to put Card to world state %s", err.Error())
+		}
 	} else {
 		fmt.Printf("Can Trader from seller \n")
 		cardAsByte, _ := json.Marshal(sellerResponseCard)
@@ -193,7 +195,6 @@ func (sc *StockContract) Trade(ctx contractapi.TransactionContextInterface, sell
 		buyerResponseCard := Card{}
 		_ = json.Unmarshal(buyerResponse, &buyerResponseCard)
 		buyerResponseCard.Count += count
-		//todo add dividendPayment
 		buyerResponseCard.DividendPayments = append(buyerResponseCard.DividendPayments, sellerResponseCard.DividendPayments...)
 		cardAsByte, _ := json.Marshal(buyerResponseCard)
 		err = ctx.GetStub().PutState(buyerCardKey, cardAsByte)

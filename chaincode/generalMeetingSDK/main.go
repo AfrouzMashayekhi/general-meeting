@@ -99,7 +99,6 @@ func main() {
 	channelName := "mychannel"
 	secret := "user1pw"
 	ccName := "stock"
-	//todo: call setup
 	fmt.Println("setting up...")
 	sdk, client, err := setup(userName, orgName, channelName, secret)
 	if err != nil {

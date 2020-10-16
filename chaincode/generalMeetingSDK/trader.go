@@ -67,7 +67,6 @@ func RegisterTrader(ccName string, client *channel.Client, traderID string) *Tra
 	}
 
 	trader := Trader{TraderID: traderID}
-	//todo: do we need returning cards?
 	return &trader
 }
 
