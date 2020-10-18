@@ -1,4 +1,4 @@
-module fabric-samples/chaincode/generalMeetingSDK
+module github.com/afrouzMashaykhi/general-meeting/chaincode/generalMeetingSDK
 
 go 1.14
 

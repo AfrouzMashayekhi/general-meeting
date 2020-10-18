@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func setup(user string, org string, channelName string, secret string) (*fabsdk.FabricSDK, *channel.Client, error) {
+func Setup(user string, org string, channelName string, secret string) (*fabsdk.FabricSDK, *channel.Client, error) {
 
 	sdk, err := fabsdk.New(config.FromFile("./config.yaml"))
 	if err != nil {
@@ -100,7 +100,7 @@ func main() {
 	secret := "user1pw"
 	ccName := "stock"
 	fmt.Println("setting up...")
-	sdk, client, err := setup(userName, orgName, channelName, secret)
+	sdk, client, err := Setup(userName, orgName, channelName, secret)
 	if err != nil {
 		fmt.Println("can't setup chaincode %+v , %+v", sdk, client)
 	}

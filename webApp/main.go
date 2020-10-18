@@ -1,14 +1,27 @@
 package main
 
 import (
+	"fmt"
+	gmSDK "github.com/afrouzMashaykhi/general-meeting/chaincode/generalMeetingSDK"
 	"github.com/gin-gonic/gin"
 )
 
 var (
-	port = ":8080"
+	port        = ":8080"
+	userSDK     = "user1"
+	orgSDK      = "trader"
+	channelName = "mychannel"
+	secret      = "user1pw"
+	ccName      = "stock"
 )
 
 func main() {
+	//setup sdk
+	fmt.Println("setting up...")
+	sdk, client, err := gmSDK.Setup(userSDK, orgSDK, channelName, secret)
+	if err != nil {
+		fmt.Println("can't setup chaincode %+v , %+v", sdk, client)
+	}
 	// Creates a router without any middleware by default
 	app := gin.Default()
 	app.LoadHTMLGlob("templates/*")

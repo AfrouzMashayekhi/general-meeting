@@ -1,6 +1,7 @@
 package main
 
 import (
+	gmSDK "github.com/afrouzMashaykhi/general-meeting/chaincode/generalMeetingSDK"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -9,10 +10,10 @@ var (
 	title = "StockChain Website"
 )
 
-type RegisterFrom struct {
-	Name      string `form:"Name"`
-	AccountID string `form:"AccountID"`
-	Org       string `form:"Organization"`
+type RegisterForm struct {
+	Name      string `form:"name" binding:"required"`
+	AccountID string `form:"accountID" binding:"required"`
+	Org       string `form:"organization" binding:"required`
 }
 
 func GetHome(c *gin.Context) {
@@ -27,8 +28,25 @@ func PostHome(c *gin.Context) {
 	})
 
 }
-func GetRegister(c *gin.Context)     {}
-func PostRegister(c *gin.Context)    {}
+func GetRegister(c *gin.Context) {
+	c.HTML(http.StatusOK, "register.tmpl", gin.H{
+		"title": title,
+	})
+}
+func PostRegister(c *gin.Context) {
+	var registerForm RegisterForm
+	if err := c.ShouldBind(&registerForm); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// if bind was ok detect org and register
+	if registerForm.Org == "trader" {
+		gmSDK.RegisterTrader()
+	}
+	if registerForm.Org == "issuer" {
+
+	}
+}
 func GetView(c *gin.Context)         {}
 func PostView(c *gin.Context)        {}
 func GetViewCompany(c *gin.Context)  {}

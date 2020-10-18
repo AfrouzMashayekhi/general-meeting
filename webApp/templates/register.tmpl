@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ .title }}</title>
+</head>
+<body>
+<h1>{{ .title }}</h1>
+<form action="/register">
+    <label for="username"> Company/Trader name: </label><br>
+    <input type="text" id="username" name="Company/Trader name"><br>
+    <label for="userID"> Stock symbol / Trader ID: </label><br>
+    <input type="text" id="userID" name="Stock symbol / Trader ID"><br>
+    <label for="orrg"> Role: </label><br>
+    <select id="userRegister" name="cars"><br>
+        <option value="trader">trader</option>
+        <option value="issuer">compnay</option>
+    </select>
+    <br>
+    <button type="submit"> Register </button>
+</form>
+
+</body>
+</html>
