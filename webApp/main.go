@@ -4,6 +4,8 @@ import (
 	"fmt"
 	gmSDK "github.com/afrouzMashaykhi/general-meeting/chaincode/generalMeetingSDK"
 	"github.com/gin-gonic/gin"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 )
 
 var (
@@ -13,12 +15,15 @@ var (
 	channelName = "mychannel"
 	secret      = "user1pw"
 	ccName      = "stock"
+	client      *channel.Client
+	sdk         *fabsdk.FabricSDK
 )
 
 func main() {
 	//setup sdk
 	fmt.Println("setting up...")
-	sdk, client, err := gmSDK.Setup(userSDK, orgSDK, channelName, secret)
+	var err error
+	sdk, client, err = gmSDK.Setup(userSDK, orgSDK, channelName, secret)
 	if err != nil {
 		fmt.Println("can't setup chaincode %+v , %+v", sdk, client)
 	}
@@ -36,6 +41,7 @@ func main() {
 	app.GET("/view/t", GetViewTrader)
 	app.GET("/view/c", GetViewCompany)
 	app.GET("/register", GetRegister)
+	app.POST("/register", PostRegister)
 	app.GET("/view/t/:user", GetTrader)
 	app.GET("/view/c/:company", GetComapny)
 	// Listen and serve on 0.0.0.0:8080

@@ -6,13 +6,13 @@
 </head>
 <body>
 <h1>{{ .title }}</h1>
-<form action="/register">
+<form action="/register" method="POST">
     <label for="username"> Company/Trader name: </label><br>
-    <input type="text" id="username" name="Company/Trader name"><br>
+    <input type="text" id="username" name="name"><br>
     <label for="userID"> Stock symbol / Trader ID: </label><br>
-    <input type="text" id="userID" name="Stock symbol / Trader ID"><br>
-    <label for="orrg"> Role: </label><br>
-    <select id="userRegister" name="cars"><br>
+    <input type="text" id="userID" name="accountID"><br>
+    <label for="org"> Role: </label><br>
+    <select id="org" name="org"><br>
         <option value="trader">trader</option>
         <option value="issuer">compnay</option>
     </select>
