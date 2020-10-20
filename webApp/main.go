@@ -36,14 +36,13 @@ func main() {
 	app.Use(gin.Logger())
 	// Serve static files
 	app.Static("/assets", "./assets")
+	app.GET("/view/t/:user", GetTrader)
+	app.GET("/view/c/:company", GetComapny)
 	app.GET("/home", GetHome)
-	app.POST("/home", PostHome)
 	app.GET("/view/t", GetViewTrader)
 	app.GET("/view/c", GetViewCompany)
 	app.GET("/register", GetRegister)
 	app.POST("/register", PostRegister)
-	app.GET("/view/t/:user", GetTrader)
-	app.GET("/view/c/:company", GetComapny)
 	// Listen and serve on 0.0.0.0:8080
 	app.Run(port)
 }

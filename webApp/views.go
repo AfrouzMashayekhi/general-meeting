@@ -26,12 +26,6 @@ func GetHome(c *gin.Context) {
 	})
 }
 
-func PostHome(c *gin.Context) {
-	c.HTML(http.StatusOK, "home.tmpl", gin.H{
-		"title": title,
-	})
-
-}
 func GetRegister(c *gin.Context) {
 	c.HTML(http.StatusOK, "register.tmpl", gin.H{
 		"title": title,
