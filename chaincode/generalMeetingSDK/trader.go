@@ -1,4 +1,4 @@
-package gmSDK
+package main
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -51,8 +51,11 @@ func RegisterTrader(ccName string, client *channel.Client, traderName string, tr
 	if err != nil {
 		fmt.Errorf("couldn't query cards for%s %s", reservedTraderID, err)
 	}
+	fmt.Println(response.Payload)
+	//var cards = sm.QueryCard{make([]sm.Card, 0)}
 	cards := sm.QueryCard{}
 	_ = json.Unmarshal(response.Payload, &cards)
+
 	for _, card := range cards.Cards {
 		invokeArgs := [][]byte{[]byte(traderID), []byte("0"), []byte(card.StockSymbol), []byte("0")}
 		_, err := client.Execute(channel.Request{
