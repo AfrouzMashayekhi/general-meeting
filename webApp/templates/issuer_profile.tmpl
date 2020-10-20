@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ .title }}</title>
+    {{ template "bootstraphead" }}
+
+<script language="javascript">
+
+    function addRow() {
+        $('#add_row').append('<div class="row">  \
+            <div class="col"> \
+                <div class="form-group"> \
+                    <input type="text" id="Percentage[]" class="form-control" name="Percentage[]"> \
+                </div> \
+            </div> \
+            <div class="col"> \
+                <div class="form-group"> \
+                    <input type="datetime" id="Time[]" class="form-control" name="Time[]"> \
+                </div> \
+            </div> \
+        </div>');
+    }
+
+</script>
+
+</head>
+<body>
+<div class="container">
+
+    <div class="row">
+        <div class="col">
+            <h4>Holding Genral Meeting</h4>
+            <div class="clearfix"></div>
+            <form action=. method="POST" class="form-inline">
+                <input type="hidden" name="issuerName" value="{{.issuerName}}" />
+
+                <div class="form-group">
+                    <label for="Dividend">Dividend:</label>
+                    <input type="text" id="Dividend" class="form-control" name="Dividend">
+                </div>
+
+                <p><strong>Payment plan:</strong></p>
+                <div class="row">
+                    <div class="col">Percentage</div>
+                    <div class="col">Due date</div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <input type="text" id="Percentage[]" class="form-control" name="Percentage[]">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <input type="datetime" id="Time[]" class="form-control" name="Time[]">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="add_row"></div>
+                <button type="button" onclick="addRow()" class="btn btn-success btn-lg">+</button>
+                <div class="clearfix"></div>
+
+                <button class="btn btn-primary" type="submit">Hold It!</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <h4>Issuer Cards </h4>
+                <div class="row">
+                    <div class="col"><h2></h2>
+                        <div class="clear"></div>
+                        <table class="table table-striped">
+                          <thead class="thead-dark">
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Trader ID</th>
+                              <th scope="col">Count</th>
+                              <th scope="col">Dividend</th>
+                              <th scope="col">Dividend Payments</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {{range $item := .items}}
+                            <tr>
+                                <td scope="col">-</td>
+                                <td scope="col">{{ $item.TraderID }}</td>
+                                <td scope="col">{{ $item.Count }}</td>
+                                <td scope="col">{{ $item.Dividend }}</td>
+                                <td scope="col">{{ $item.DividendPayments }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

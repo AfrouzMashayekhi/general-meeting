@@ -32,13 +32,14 @@ type Trader struct {
 	// Cards is  a list of Trader's cards which have info of dividend and its pays
 	Cards []sm.Card `json:"cards"`
 	// TraderID is a unique ID for every trader who register in this market
-	TraderID string `json:"traderID"`
+	TraderID   string `json:"traderID"`
+	TraderName string `json:"traderName"`
 }
 
 var reservedTraderID []byte = []byte("afrouz")
 
 // RegisterTrader func is called when someone want to join the market
-func RegisterTrader(ccName string, client *channel.Client, traderID string) *Trader {
+func RegisterTrader(ccName string, client *channel.Client, traderName string, traderID string) *Trader {
 
 	// add cards to worldstate for every trader in market
 	response, err := client.Query(channel.Request{
@@ -66,7 +67,7 @@ func RegisterTrader(ccName string, client *channel.Client, traderID string) *Tra
 
 	}
 
-	trader := Trader{TraderID: traderID}
+	trader := Trader{TraderID: traderID, TraderName: traderName}
 	return &trader
 }
 

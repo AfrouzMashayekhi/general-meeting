@@ -3,13 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ .title }}</title>
+    {{ template "bootstraphead.tmpl" }}
 </head>
 <body>
-<h1>{{ .title }}</h1>
-<form action="/register">
-    <button type="submit"> Register </button>
-    <button type="submit" formaction="/view/c"> ViewCompanies </button>
-    <button type="submit" formaction="/view/t"> ViewTraders </button>
-</form>
+    <div class="container">
+        <h1>{{ .title }}</h1>
+        <div class="row">
+                <div class="col"><h2>Traders</h2>
+                <a href="/register" class="btn btn-info btn-lg" role="button">Register New</a>
+                <a href="/view/t" class="btn btn-info btn-lg" role="button">View and Manage</a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <h2>Companies</h2>
+                <a href="/register" class="btn btn-info btn-lg" role="button">Register New</a>
+                <a href="/view/c" class="btn btn-info btn-lg" role="button">View all</a>
+            </div>
+        </div>
+        </div>
+    </div>
 </body>
 </html>

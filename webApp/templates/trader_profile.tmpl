@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ .title }}</title>
+    {{ template "bootstraphead" }}
+
+<script language="javascript">
+
+    function addRow() {
+        $('#add_row').append('<div class="row">  \
+            <div class="col"> \
+                <div class="form-group"> \
+                    <input type="text" id="Percentage[]" class="form-control" name="Percentage[]"> \
+                </div> \
+            </div> \
+            <div class="col"> \
+                <div class="form-group"> \
+                    <input type="datetime" id="Time[]" class="form-control" name="Time[]"> \
+                </div> \
+            </div> \
+        </div>');
+    }
+
+</script>
+
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h4>Add card</h4>
+            <form action=. method="POST">
+                <input type="hidden" name="TraderID" value="{{.TraderID}}" />
+
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="Count">Count</label>
+                        <input type="number" id="Count" name="Count" class="form-control" min="0" step="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="StockSymbol">Stock sybmol:</label>
+                        <input type="text" id="StockSymbol" class="form-control" name="StockSymbol">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="Dividend">Dividend:</label>
+                        <input type="text" id="Dividend" class="form-control" name="Dividend">
+                    </div>
+                </div>
+
+                <p><strong>Payment plan:</strong></p>
+                <div class="row">
+                    <div class="col">Percentage</div>
+                    <div class="col">Due date</div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <input type="text" id="Percentage[]" class="form-control" name="Percentage[]">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <input type="datetime" id="Time[]" class="form-control" name="Time[]">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="add_row"></div>
+                <button type="button" onclick="addRow()" class="btn btn-success btn-lg">+</button>
+                <div class="clearfix"></div>
+                <button type="submit" class="btn btn-lg btn-primary">Add</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <h4>Make Transaction</h4>
+            <div class="clearfix"></div>
+            <form action=. method="POST" class="form-inline">
+                <input type="hidden" name="Seller" value="{{.TraderID}}" />
+
+                <div class="form-group">
+                    <label for="Buyer">Buyer</label>
+                    <input type="text" class="form-control" id="Buyer" name="Buyer">
+                    <span class="form-text invalid-feedback">Please enter correctly</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="SellCount">Count</label>
+                    <input type="text" class="form-control" id="SellCount" name="Count">
+                </div>
+
+                <div class="form-group">
+                    <label for="SellSymbol">Symbol</label>
+                    <input type="text" class="form-control" id="SellSymbol" name="StockSymbol">
+                </div>
+
+                <button class="btn btn-primary" type="submit">Trade</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <h4>Trader Cards</h4>
+                <div class="row">
+                    <div class="col"><h2></h2>
+                        <div class="clear"></div>
+                        <table class="table table-striped">
+                          <thead class="thead-dark">
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Stock Symbol</th>
+                              <th scope="col">Count</th>
+                              <th scope="col">Dividend</th>
+                              <th scope="col">Dividend Payments</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {{range $item := .items}}
+                            <tr>
+                                <td scope="col">-</td>
+                                <td scope="col">{{ $item.StockSymbol }}</td>
+                                <td scope="col">{{ $item.Count }}</td>
+                                <td scope="col">{{ $item.Dividend }}</td>
+                                <td scope="col">{{ $item.DividendPayments }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
