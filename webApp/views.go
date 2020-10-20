@@ -56,11 +56,35 @@ func PostRegister(c *gin.Context) {
 }
 func GetView(c *gin.Context)         {}
 func PostView(c *gin.Context)        {}
-func GetViewCompany(c *gin.Context)  {}
-func PostViewCompany(c *gin.Context) {}
-func GetViewTrader(c *gin.Context)   {}
-func PostViewTrader(c *gin.Context)  {}
+func GetViewCompany(c *gin.Context)  {
+    return getViewList(c, "issuer")
+}
+func GetViewTrader(c *gin.Context)   {
+    return getViewList(c, "trader")
+}
 func GetTrader(c *gin.Context)       {}
 func PostTrader(c *gin.Context)      {}
 func GetComapny(c *gin.Context)      {}
 func PostCompany(c *gin.Context)     {}
+
+func getViewList(c *gin.Context, listType string) {
+    var listtype_title = nil
+    var idfieldname = nil
+    var items = nil
+    if listType == "trader" {
+        listtype_title = "Traders"
+        idfieldname = "TraderID"
+        items = traderList
+    } else {
+        listtype_title = "Companies"
+        idfieldname = "StockSymbol"
+        items = issuerList
+    }
+
+    c.HTML(http.StatusOK, "listview.tmpl", gin.H{
+        "listtype": listtype_title,
+        "title": "Manage Entities",
+        "idfieldname": idfieldname,
+        "items": items,
+    })
+}
