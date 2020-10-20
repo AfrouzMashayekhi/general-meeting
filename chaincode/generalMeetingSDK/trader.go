@@ -72,33 +72,33 @@ func RegisterTrader(ccName string, client *channel.Client, traderName string, tr
 }
 
 // AddCards func add cards for trader of issuer validate it return true
-func (t *Trader) AddCards(ccName string, client *channel.Client, cards []sm.Card) error {
+func (t *Trader) AddCards(ccName string, client *channel.Client, card sm.Card) error {
 
-	for _, card := range cards {
-		// todo: it's a distributed app how can I find issuer create new one?
-		issuer := Issuer{
-			StockSymbol: card.StockSymbol,
-		}
-		if issuer.ValidateCard(card) {
-			//fmt.Println(card.DividendPayments)
-			paymentAsByte, _ := json.Marshal(card.DividendPayments)
-			//fmt.Println(paymentAsByte)
-			countString := strconv.Itoa(card.Count)
-			dividendString := strconv.Itoa(card.Dividend)
-			invokeArgs := [][]byte{[]byte(card.TraderID), []byte(card.StockSymbol), []byte(countString), []byte(dividendString), paymentAsByte}
-			_, err := client.Execute(channel.Request{
-				ChaincodeID: ccName,
-				Fcn:         "UpdateFields",
-				Args:        invokeArgs,
-			}, channel.WithRetry(retry.DefaultChannelOpts))
-
-			if err != nil {
-				return fmt.Errorf("Failed to validate and update card: %+v\n", err)
-			}
-		} else {
-			return fmt.Errorf("the Card : %+v is not Validated by issuer", card)
-		}
+	//for _, card := range cards {
+	// todo: it's a distributed app how can I find issuer create new one?
+	issuer := Issuer{
+		StockSymbol: card.StockSymbol,
 	}
+	if issuer.ValidateCard(card) {
+		//fmt.Println(card.DividendPayments)
+		paymentAsByte, _ := json.Marshal(card.DividendPayments)
+		//fmt.Println(paymentAsByte)
+		countString := strconv.Itoa(card.Count)
+		dividendString := strconv.Itoa(card.Dividend)
+		invokeArgs := [][]byte{[]byte(card.TraderID), []byte(card.StockSymbol), []byte(countString), []byte(dividendString), paymentAsByte}
+		_, err := client.Execute(channel.Request{
+			ChaincodeID: ccName,
+			Fcn:         "UpdateFields",
+			Args:        invokeArgs,
+		}, channel.WithRetry(retry.DefaultChannelOpts))
+
+		if err != nil {
+			return fmt.Errorf("Failed to validate and update card: %+v\n", err)
+		}
+	} else {
+		return fmt.Errorf("the Card : %+v is not Validated by issuer", card)
+	}
+	//}
 	return nil
 }
 

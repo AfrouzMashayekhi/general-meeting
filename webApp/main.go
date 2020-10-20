@@ -37,8 +37,8 @@ func main() {
 	// Serve static files
 	app.Static("/assets", "./assets")
 	app.GET("/view/t/:trader", GetTrader)
-	app.POST("/view/t/:trader/add", PostTraderAddCard)
-	app.POST("/view/t/:trader/trade", PostTraderTrade)
+	app.POST("/view/t/:trader", PostTrader)
+	//app.POST("/view/t/:trader/trade", PostTraderTrade)
 	app.GET("/view/c/:company", GetComapny)
 	app.POST("/view/c/:company", PostCompanyGenralMeeting)
 	app.GET("/home", GetHome)
@@ -48,4 +48,5 @@ func main() {
 	app.POST("/register", PostRegister)
 	// Listen and serve on 0.0.0.0:8080
 	app.Run(port)
+	sdk.Close()
 }

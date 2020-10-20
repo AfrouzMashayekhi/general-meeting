@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ .title }}</title>
-    {{ template "bootstraphead" }}
+    {{ template "bootstraphead.tmpl" }}
 
 <script language="javascript">
 
@@ -11,12 +11,12 @@
         $('#add_row').append('<div class="row">  \
             <div class="col"> \
                 <div class="form-group"> \
-                    <input type="text" id="Percentage[]" class="form-control" name="Percentage[]"> \
+                    <input type="text" id="Percentage[]" class="form-control" name="percentage[]"> \
                 </div> \
             </div> \
             <div class="col"> \
                 <div class="form-group"> \
-                    <input type="datetime" id="Time[]" class="form-control" name="Time[]"> \
+                    <input type="datetime" id="Time[]" class="form-control" name="time[]"> \
                 </div> \
             </div> \
         </div>');
@@ -30,24 +30,24 @@
     <div class="row">
         <div class="col">
             <h4>Add card</h4>
-            <form action=. method="POST">
-                <input type="hidden" name="TraderID" value="{{.TraderID}}" />
+            <form action="/view/t/{{ .traderID }}" method="POST">
+                <input type="hidden" name="traderID" value="{{.traderID}}" />
 
                 <div class="form-inline">
                     <div class="form-group">
                         <label for="Count">Count</label>
-                        <input type="number" id="Count" name="Count" class="form-control" min="0" step="1">
+                        <input type="number" id="Count" name="count" class="form-control" min="0" step="1">
                     </div>
 
                     <div class="form-group">
                         <label for="StockSymbol">Stock sybmol:</label>
-                        <input type="text" id="StockSymbol" class="form-control" name="StockSymbol">
+                        <input type="text" id="StockSymbol" class="form-control" name="stockSymbol">
                     </div>
 
 
                     <div class="form-group">
                         <label for="Dividend">Dividend:</label>
-                        <input type="text" id="Dividend" class="form-control" name="Dividend">
+                        <input type="text" id="Dividend" class="form-control" name="dividend">
                     </div>
                 </div>
 
@@ -61,12 +61,12 @@
                 <div class="row">
                     <div class="col">
                         <div class="form-group">
-                            <input type="text" id="Percentage[]" class="form-control" name="Percentage[]">
+                            <input type="text" id="Percentage[]" class="form-control" name="percentage[]">
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-group">
-                            <input type="datetime" id="Time[]" class="form-control" name="Time[]">
+                            <input type="datetime" id="Time[]" class="form-control" name="time[]">
                         </div>
                     </div>
                 </div>
@@ -83,23 +83,23 @@
         <div class="col">
             <h4>Make Transaction</h4>
             <div class="clearfix"></div>
-            <form action=. method="POST" class="form-inline">
-                <input type="hidden" name="Seller" value="{{.TraderID}}" />
+            <form action="/view/t/{{ .traderID }}" method="POST" class="form-inline">
+                <input type="hidden" name="seller" value="{{.traderID}}" />
 
                 <div class="form-group">
                     <label for="Buyer">Buyer</label>
-                    <input type="text" class="form-control" id="Buyer" name="Buyer">
+                    <input type="text" class="form-control" id="Buyer" name="buyer">
                     <span class="form-text invalid-feedback">Please enter correctly</span>
                 </div>
 
                 <div class="form-group">
                     <label for="SellCount">Count</label>
-                    <input type="text" class="form-control" id="SellCount" name="Count">
+                    <input type="text" class="form-control" id="SellCount" name="sellCount">
                 </div>
 
                 <div class="form-group">
                     <label for="SellSymbol">Symbol</label>
-                    <input type="text" class="form-control" id="SellSymbol" name="StockSymbol">
+                    <input type="text" class="form-control" id="SellSymbol" name="tradeStockSymbol">
                 </div>
 
                 <button class="btn btn-primary" type="submit">Trade</button>
@@ -132,6 +132,7 @@
                                 <td scope="col">{{ $item.Dividend }}</td>
                                 <td scope="col">{{ $item.DividendPayments }}</td>
                             </tr>
+                            {{end}}
                           </tbody>
                         </table>
                     </div>

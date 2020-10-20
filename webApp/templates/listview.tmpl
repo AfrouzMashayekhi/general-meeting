@@ -25,7 +25,7 @@
                     {{range $item := .items}}
                     <tr>
                         <td scope="col">-</td>
-                        <td scope="col"><a href="/c/{{ $item.StockSymbol }}">{{ $item.CompanyName }}</a></td>
+                        <td scope="col"><a href="/view/c/:{{ $item.StockSymbol }}">{{ $item.CompanyName }}</a></td>
                         <td scope="col">{{ $item.StockSymbol }}</td>
                     </tr>
                     {{end}}
@@ -33,7 +33,7 @@
                     {{range $item := .items}}
                     <tr>
                         <td scope="col">-</td>
-                        <td scope="col"><a href="/t/{{ $item.TraderID }}">{{ $item.TraderID }}</a></td>
+                        <td scope="col"><a href="/view/t/:{{ $item.TraderID }}">{{ $item.TraderID }}</a></td>
                         <td scope="col">{{ $item.TraderID }}</td>
                     </tr>
                     {{end}}
