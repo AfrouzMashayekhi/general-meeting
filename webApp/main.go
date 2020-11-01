@@ -1,14 +1,32 @@
 package main
 
 import (
+	"fmt"
+	gmSDK "github.com/afrouzMashaykhi/general-meeting/chaincode/generalMeetingSDK"
 	"github.com/gin-gonic/gin"
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 )
 
 var (
-	port = ":8080"
+	port        = ":8080"
+	userSDK     = "user1"
+	orgSDK      = "trader"
+	channelName = "mychannel"
+	secret      = "user1pw"
+	ccName      = "stock"
+	client      *channel.Client
+	sdk         *fabsdk.FabricSDK
 )
 
 func main() {
+	//setup sdk
+	fmt.Println("setting up...")
+	var err error
+	sdk, client, err = gmSDK.Setup(userSDK, orgSDK, channelName, secret)
+	if err != nil {
+		fmt.Println("can't setup chaincode %+v , %+v", sdk, client)
+	}
 	// Creates a router without any middleware by default
 	app := gin.Default()
 	app.LoadHTMLGlob("templates/*")
@@ -18,13 +36,17 @@ func main() {
 	app.Use(gin.Logger())
 	// Serve static files
 	app.Static("/assets", "./assets")
+	app.GET("/view/t/:trader", GetTrader)
+	app.POST("/view/t/:trader", PostTrader)
+	//app.POST("/view/t/:trader/trade", PostTraderTrade)
+	app.GET("/view/c/:company", GetComapny)
+	app.POST("/view/c/:company", PostCompanyGenralMeeting)
 	app.GET("/home", GetHome)
-	app.POST("/home", PostHome)
 	app.GET("/view/t", GetViewTrader)
 	app.GET("/view/c", GetViewCompany)
 	app.GET("/register", GetRegister)
-	app.GET("/view/t/:user", GetTrader)
-	app.GET("/view/c/:company", GetComapny)
+	app.POST("/register", PostRegister)
 	// Listen and serve on 0.0.0.0:8080
 	app.Run(port)
+	sdk.Close()
 }

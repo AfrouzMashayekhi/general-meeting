@@ -1,4 +1,4 @@
-package gmSDK
+package main
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func setup(user string, org string, channelName string, secret string) (*fabsdk.FabricSDK, *channel.Client, error) {
+func Setup(user string, org string, channelName string, secret string) (*fabsdk.FabricSDK, *channel.Client, error) {
 
 	sdk, err := fabsdk.New(config.FromFile("./config.yaml"))
 	if err != nil {
@@ -93,6 +93,7 @@ func enrollUser(sdk *fabsdk.FabricSDK, user string, secret string) error {
 	}
 	return nil
 }
+
 func main() {
 	userName := "user1"
 	orgName := "trader"
@@ -100,13 +101,13 @@ func main() {
 	secret := "user1pw"
 	ccName := "stock"
 	fmt.Println("setting up...")
-	sdk, client, err := setup(userName, orgName, channelName, secret)
+	sdk, client, err := Setup(userName, orgName, channelName, secret)
 	if err != nil {
 		fmt.Println("can't setup chaincode %+v , %+v", sdk, client)
 	}
 	fmt.Println("register mhmmd trader..")
-	mhmmd := RegisterTrader(ccName, client, "mhmmd")
-	mhmmdCards := []sm.Card{{
+	mhmmd := RegisterTrader(ccName, client, "mhmmd", "mhmmd")
+	mhmmdCards := sm.Card{
 		TraderID:    "mhmmd",
 		Count:       300,
 		StockSymbol: "afrouz",
@@ -118,7 +119,7 @@ func main() {
 			Percentage: 0.2,
 			PDate:      time.Date(2020, 11, 12, 0, 0, 0, 0, time.UTC),
 		}},
-	}}
+	}
 
 	fmt.Println("update cards of mhmmd %+v", mhmmdCards)
 	err = mhmmd.AddCards(ccName, client, mhmmdCards)
@@ -148,8 +149,8 @@ func main() {
 		PDate:      time.Date(2020, 10, 28, 0, 0, 0, 0, time.UTC),
 	}}
 	fmt.Println("Register trader Moosa")
-	moosa := RegisterTrader(ccName, client, "moosa")
-	moosaCards := []sm.Card{{
+	moosa := RegisterTrader(ccName, client, "moosa", "moosa")
+	moosaCards := sm.Card{
 		TraderID:    "moosa",
 		Count:       500,
 		StockSymbol: "msft",
@@ -161,7 +162,7 @@ func main() {
 			Percentage: 0.4,
 			PDate:      time.Date(2020, 11, 12, 0, 0, 0, 0, time.UTC),
 		}},
-	}}
+	}
 	fmt.Println("Update cards of Moosa %v", moosaCards)
 	err = moosa.AddCards(ccName, client, moosaCards)
 	if err != nil {

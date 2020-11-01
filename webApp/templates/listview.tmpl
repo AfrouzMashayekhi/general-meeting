@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ .title }}</title>
+    {{ template "bootstraphead.tmpl" }}
+</head>
+<body>
+        <div class="container">
+        <h1>{{ .title }}</h1>
+        <div class="row">
+            <div class="col"><h2>{{ .listtype }}</h2>
+                <a href="/register" class="btn btn-dark" role="button">Register New</a>
+                <div class="clear"></div>
+                <table class="table table-striped">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">{{ .idfieldname }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{ if eq .listtype  "Companies" }}
+                    {{range $item := .items}}
+                    <tr>
+                        <td scope="col">-</td>
+                        <td scope="col"><a href="/view/c/:{{ $item.StockSymbol }}">{{ $item.CompanyName }}</a></td>
+                        <td scope="col">{{ $item.StockSymbol }}</td>
+                    </tr>
+                    {{end}}
+                    {{ else }}
+                    {{range $item := .items}}
+                    <tr>
+                        <td scope="col">-</td>
+                        <td scope="col"><a href="/view/t/:{{ $item.TraderID }}">{{ $item.TraderID }}</a></td>
+                        <td scope="col">{{ $item.TraderID }}</td>
+                    </tr>
+                    {{end}}
+                    {{end}}
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package gmSDK
+package main
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -32,13 +32,14 @@ type Trader struct {
 	// Cards is  a list of Trader's cards which have info of dividend and its pays
 	Cards []sm.Card `json:"cards"`
 	// TraderID is a unique ID for every trader who register in this market
-	TraderID string `json:"traderID"`
+	TraderID   string `json:"traderID"`
+	TraderName string `json:"traderName"`
 }
 
 var reservedTraderID []byte = []byte("afrouz")
 
 // RegisterTrader func is called when someone want to join the market
-func RegisterTrader(ccName string, client *channel.Client, traderID string) *Trader {
+func RegisterTrader(ccName string, client *channel.Client, traderName string, traderID string) *Trader {
 
 	// add cards to worldstate for every trader in market
 	response, err := client.Query(channel.Request{
@@ -50,8 +51,11 @@ func RegisterTrader(ccName string, client *channel.Client, traderID string) *Tra
 	if err != nil {
 		fmt.Errorf("couldn't query cards for%s %s", reservedTraderID, err)
 	}
+	fmt.Println(response.Payload)
+	//var cards = sm.QueryCard{make([]sm.Card, 0)}
 	cards := sm.QueryCard{}
 	_ = json.Unmarshal(response.Payload, &cards)
+
 	for _, card := range cards.Cards {
 		invokeArgs := [][]byte{[]byte(traderID), []byte("0"), []byte(card.StockSymbol), []byte("0")}
 		_, err := client.Execute(channel.Request{
@@ -66,38 +70,38 @@ func RegisterTrader(ccName string, client *channel.Client, traderID string) *Tra
 
 	}
 
-	trader := Trader{TraderID: traderID}
+	trader := Trader{TraderID: traderID, TraderName: traderName}
 	return &trader
 }
 
 // AddCards func add cards for trader of issuer validate it return true
-func (t *Trader) AddCards(ccName string, client *channel.Client, cards []sm.Card) error {
+func (t *Trader) AddCards(ccName string, client *channel.Client, card sm.Card) error {
 
-	for _, card := range cards {
-		// todo: it's a distributed app how can I find issuer create new one?
-		issuer := Issuer{
-			StockSymbol: card.StockSymbol,
-		}
-		if issuer.ValidateCard(card) {
-			//fmt.Println(card.DividendPayments)
-			paymentAsByte, _ := json.Marshal(card.DividendPayments)
-			//fmt.Println(paymentAsByte)
-			countString := strconv.Itoa(card.Count)
-			dividendString := strconv.Itoa(card.Dividend)
-			invokeArgs := [][]byte{[]byte(card.TraderID), []byte(card.StockSymbol), []byte(countString), []byte(dividendString), paymentAsByte}
-			_, err := client.Execute(channel.Request{
-				ChaincodeID: ccName,
-				Fcn:         "UpdateFields",
-				Args:        invokeArgs,
-			}, channel.WithRetry(retry.DefaultChannelOpts))
-
-			if err != nil {
-				return fmt.Errorf("Failed to validate and update card: %+v\n", err)
-			}
-		} else {
-			return fmt.Errorf("the Card : %+v is not Validated by issuer", card)
-		}
+	//for _, card := range cards {
+	// todo: it's a distributed app how can I find issuer create new one?
+	issuer := Issuer{
+		StockSymbol: card.StockSymbol,
 	}
+	if issuer.ValidateCard(card) {
+		//fmt.Println(card.DividendPayments)
+		paymentAsByte, _ := json.Marshal(card.DividendPayments)
+		//fmt.Println(paymentAsByte)
+		countString := strconv.Itoa(card.Count)
+		dividendString := strconv.Itoa(card.Dividend)
+		invokeArgs := [][]byte{[]byte(card.TraderID), []byte(card.StockSymbol), []byte(countString), []byte(dividendString), paymentAsByte}
+		_, err := client.Execute(channel.Request{
+			ChaincodeID: ccName,
+			Fcn:         "UpdateFields",
+			Args:        invokeArgs,
+		}, channel.WithRetry(retry.DefaultChannelOpts))
+
+		if err != nil {
+			return fmt.Errorf("Failed to validate and update card: %+v\n", err)
+		}
+	} else {
+		return fmt.Errorf("the Card : %+v is not Validated by issuer", card)
+	}
+	//}
 	return nil
 }
 

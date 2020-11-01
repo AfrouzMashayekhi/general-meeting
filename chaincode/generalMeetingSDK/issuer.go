@@ -1,4 +1,4 @@
-package gmSDK
+package main
 
 import (
 	"encoding/json"

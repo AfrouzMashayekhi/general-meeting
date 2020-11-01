@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ .title }}</title>
+    {{ template "bootstraphead.tmpl" }}
+</head>
+<body>
+<div class="container">
+    <h1>{{ .title }}</h1>
+    <div class="row">
+    <div class="col col-6">
+        <!--left column -->
+        <h2>Register new trader</h2>
+        <form action="/register" method="POST">
+          <div class="form-group">
+            <label for="username">Trader name:</label>
+            <input type="text" id="username" name="name" class="form-control form-control-lg">
+            <small id="usernameHelp" class="form-text text-muted">The username for trader</small>
+          </div>
+
+          <div class="form-group">
+            <label for="userID">Trader ID: </label>
+            <input type="text" id="userID" name="accountID" class="form-control form-control-lg">
+          </div>
+
+          <input type="hidden" name="org" value="trader" />
+
+          <button type="submit" class="btn btn-primary">Register Trader</button>
+        </form>
+    </div>
+
+    <div class="col col-6">
+        <!--right column -->
+        <h2>Register new company</h2>
+        <form action="/register" method="POST">
+          <div class="form-group">
+            <label for="username">Company name:</label>
+            <input type="text" id="username" name="name" class="form-control form-control-lg">
+            <small id="usernameHelp" class="form-text text-muted">The name of the company</small>
+          </div>
+
+          <div class="form-group">
+            <label for="userID">Stock symbol:</label>
+            <input type="text" id="userID" name="accountID" class="form-control form-control-lg">
+          </div>
+
+          <input type="hidden" name="org" value="issuer" />
+
+          <button type="submit" class="btn btn-primary">Register Company</button>
+        </form>
+    </div>
+    </div>
+</div>
+</body>
+</html>
