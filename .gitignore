@@ -17,3 +17,8 @@ ordererOrganizations/
 peerOrganizations/
 system-genesis-block/
 log.txt
+/chaincode/stockmarket/card
+/my-network/organizations/fabric-ca/company/fabric-ca-server-config.yaml
+/my-network/organizations/fabric-ca/trader/fabric-ca-server-config.yaml
+/chaincode/generalMeetingSDK/generalMeetingSDK
+/webApp/webApp
