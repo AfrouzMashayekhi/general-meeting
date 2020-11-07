@@ -6,6 +6,7 @@ import (
 	sm "github.com/afrouzMashaykhi/general-meeting/chaincode/stockmarket"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -82,6 +83,7 @@ func GetViewTrader(c *gin.Context) {
 }
 func GetTrader(c *gin.Context) {
 	queriedTID := c.Param("trader")
+	queriedTID = strings.Replace(queriedTID, ":", "", -1)
 	indexTrader := -1
 	for i, traders := range traderList {
 		traders.TraderName = queriedTID
@@ -96,58 +98,65 @@ func GetTrader(c *gin.Context) {
 	c.HTML(http.StatusOK, "trader_profile.tmpl", gin.H{
 		"title":    title,
 		"traderID": queriedTID,
-		"items":    items,
+		"items":    items.Cards,
 	})
 }
 func PostTrader(c *gin.Context) {
 	queriedTID := c.Param("trader")
+	queriedTID = strings.Replace(queriedTID, ":", "", -1)
 	//POST ADD CARD
 	var traderCardForm TraderCardForm
-	if err := c.ShouldBind(&traderCardForm); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	//khob alan man 2 ta form ro check mikonam chejor i joda   na joda
 	indexTrader := -1
-	for i, traders := range traderList {
-		traders.TraderName = queriedTID
-		indexTrader = i
-		break
-	}
-	//validate DividendPayments
-	var inPayments []sm.DividendPayment
-	for j, percentage := range traderCardForm.Percentages {
-		dpay := sm.DividendPayment{
-			Percentage: percentage,
-			PDate:      traderCardForm.Times[j],
+	if c.PostForm("formName") == "Add" {
+		if err := c.ShouldBind(&traderCardForm); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		}
-		inPayments = append(inPayments, dpay)
-	}
-	addingCard := sm.Card{
-		TraderID:         traderCardForm.TraderID,
-		Count:            traderCardForm.Count,
-		StockSymbol:      traderCardForm.StockSymbol,
-		Dividend:         traderCardForm.Dividend,
-		DividendPayments: inPayments,
-	}
-	err := traderList[indexTrader].AddCards(ccName, client, addingCard)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		for i, traders := range traderList {
+			traders.TraderName = queriedTID
+			indexTrader = i
+			break
+		}
+		//validate DividendPayments
+		var inPayments []sm.DividendPayment
+		for j, percentage := range traderCardForm.Percentages {
+			dpay := sm.DividendPayment{
+				Percentage: percentage,
+				PDate:      traderCardForm.Times[j],
+			}
+			inPayments = append(inPayments, dpay)
+		}
+		addingCard := sm.Card{
+			TraderID:         traderCardForm.TraderID,
+			Count:            traderCardForm.Count,
+			StockSymbol:      traderCardForm.StockSymbol,
+			Dividend:         traderCardForm.Dividend,
+			DividendPayments: inPayments,
+		}
+		err := traderList[indexTrader].AddCards(ccName, client, addingCard)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 	}
 	//POST TRADE
 
 	var tradeForm TradeForm
-	if err := c.ShouldBind(&tradeForm); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	err = gmSDK.Trading(ccName, client, tradeForm.Seller, tradeForm.Buyer, tradeForm.Count, tradeForm.StockSymbol)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	if c.PostForm("formName") == "Trade" {
+		if err := c.ShouldBind(&tradeForm); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		err := gmSDK.Trading(ccName, client, tradeForm.Seller, tradeForm.Buyer, tradeForm.Count, tradeForm.StockSymbol)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 	}
 	// GET CARD
 	items, err := traderList[indexTrader].GetCards(ccName, client)
+	//yani for?
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -155,12 +164,13 @@ func PostTrader(c *gin.Context) {
 	c.HTML(http.StatusOK, "trader_profile.tmpl", gin.H{
 		"title":    title,
 		"traderID": queriedTID,
-		"items":    items,
+		"items":    items.Cards,
 	})
 }
 
 func GetComapny(c *gin.Context) {
 	queriedSS := c.Param("company")
+	queriedSS = strings.Replace(queriedSS, ":", "", -1)
 	indexIssuer := -1
 	for i, issuers := range issuerList {
 		issuers.StockSymbol = queriedSS
@@ -175,14 +185,12 @@ func GetComapny(c *gin.Context) {
 	c.HTML(http.StatusOK, "issuer_profile.tmpl", gin.H{
 		"title":      title,
 		"issuerName": queriedSS,
-		"items":      items,
-	})
-	c.HTML(http.StatusOK, "issuer_profile.tmpl", gin.H{
-		"title": title,
+		"items":      items.Cards,
 	})
 }
 func PostCompanyGenralMeeting(c *gin.Context) {
 	queriedSS := c.Param("company")
+	queriedSS = strings.Replace(queriedSS, ":", "", -1)
 	var gMeetingForm GeneralMeetingForm
 	//POST GENERAL MEETING Part
 	if err := c.ShouldBind(&gMeetingForm); err != nil {
@@ -219,7 +227,7 @@ func PostCompanyGenralMeeting(c *gin.Context) {
 	c.HTML(http.StatusOK, "issuer_profile.tmpl", gin.H{
 		"title":      title,
 		"issuerName": queriedSS,
-		"items":      items,
+		"items":      items.Cards,
 	})
 
 }
