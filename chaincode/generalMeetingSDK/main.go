@@ -12,7 +12,7 @@ import (
 
 func Setup(user string, org string, channelName string, secret string) (*fabsdk.FabricSDK, *channel.Client, error) {
 
-	sdk, err := fabsdk.New(config.FromFile("./config.yaml"))
+	sdk, err := fabsdk.New(config.FromFile("/home/afrouz/go/src/fabric-samples/chaincode/generalMeetingSDK/config.yaml"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to create new SDK: %s\n", err)
 	}
