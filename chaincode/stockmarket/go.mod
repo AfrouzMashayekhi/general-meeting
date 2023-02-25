@@ -18,7 +18,7 @@ require (
 	github.com/rogpeppe/go-internal v1.6.2 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
-	golang.org/x/net v0.0.0-20201002202402-0a1ea396d57c // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/genproto v0.0.0-20201002142447-3860012362da // indirect
 	google.golang.org/grpc v1.32.0 // indirect
